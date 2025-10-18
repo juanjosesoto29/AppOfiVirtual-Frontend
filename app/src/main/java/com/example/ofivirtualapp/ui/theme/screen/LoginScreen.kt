@@ -1,98 +1,108 @@
 package com.example.ofivirtualapp.ui.theme.screen
 
-import android.widget.Toast
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
-import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
 
 @Composable
 fun LoginScreen(
+    authViewModel: AuthViewModel, // <-- PARÁMETRO AÑADIDO Y REORDENADO
     onLoginOk: () -> Unit,
-    onGoRegister: () -> Unit,
-    authViewModel: AuthViewModel = viewModel() // Inyectamos el ViewModel
+    onGoRegister: () -> Unit
 ) {
-    // Campos de texto con estado (pre-llenados para facilitar pruebas)
-    var email by remember { mutableStateOf("test@ofivirtual.cl") }
-    var password by remember { mutableStateOf("Ofivirtual1234") }
+    val formState = authViewModel.loginFormState // Ahora esto es seguro
 
-    // Obtenemos el estado de la UI desde el ViewModel y el contexto actual
-    val authState = authViewModel.authUiState
-    val context = LocalContext.current
-
-    // Efecto para mostrar un mensaje (Toast) cuando hay un error
-    LaunchedEffect(authState.error) {
-        authState.error?.let { errorMessage ->
-            Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT).show()
-            authViewModel.clearError() // Limpia el error después de mostrarlo para no repetirlo
-        }
-    }
-
-    Box(
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
+            .padding(horizontal = 24.dp)
+            .verticalScroll(rememberScrollState()),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+        Text("Bienvenido de Vuelta", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+        Text("Inicia sesión para continuar.", style = MaterialTheme.typography.bodyMedium, color = Color.Gray)
+        Spacer(Modifier.height(32.dp))
+
+        formState.generalError?.let {
+            Text(
+                text = it,
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+        }
+
+        OutlinedTextField(
+            value = formState.email,
+            onValueChange = authViewModel::onLoginEmailChange,
+            label = { Text("Correo Electrónico") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = formState.emailError != null,
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+            singleLine = true
+        )
+        formState.emailError?.let {
+            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(Modifier.height(16.dp))
+
+        OutlinedTextField(
+            value = formState.password,
+            onValueChange = authViewModel::onLoginPasswordChange,
+            label = { Text("Contraseña") },
+            modifier = Modifier.fillMaxWidth(),
+            isError = formState.passwordError != null,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            singleLine = true
+        )
+        formState.passwordError?.let {
+            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(Modifier.height(8.dp))
+
+        Text(
+            text = "¿Olvidaste tu contraseña?",
+            modifier = Modifier
+                .align(Alignment.End)
+                .clickable { /* TODO: Navegar a pantalla de recuperación */ },
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colorScheme.primary
+        )
+        Spacer(Modifier.height(24.dp))
+
+        Button(
+            onClick = { authViewModel.login(onSuccess = onLoginOk) },
+            modifier = Modifier.fillMaxWidth().height(48.dp)
         ) {
-            Text("Iniciar Sesión", style = MaterialTheme.typography.headlineMedium)
-            Spacer(Modifier.height(24.dp))
+            Text("Iniciar Sesión")
+        }
+        Spacer(Modifier.height(16.dp))
 
-            // Campo para el correo electrónico
-            OutlinedTextField(
-                value = email,
-                onValueChange = { email = it },
-                label = { Text("Correo electrónico") },
-                modifier = Modifier.fillMaxWidth()
+        Row {
+            Text("¿No tienes una cuenta?", style = MaterialTheme.typography.bodySmall)
+            Spacer(Modifier.width(4.dp))
+            Text(
+                text = "Regístrate",
+                color = MaterialTheme.colorScheme.primary,
+                fontWeight = FontWeight.Bold,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.clickable(onClick = onGoRegister)
             )
-            Spacer(Modifier.height(12.dp))
-
-            // Campo para la contraseña
-            OutlinedTextField(
-                value = password,
-                onValueChange = { password = it },
-                label = { Text("Contraseña") },
-                visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
-            )
-            Spacer(Modifier.height(24.dp))
-
-            // Botón para ingresar
-            Button(
-                onClick = {
-                    // Llama a la función login del ViewModel
-                    authViewModel.login(email, password, onLoginOk)
-                },
-                enabled = !authState.isLoading, // Se deshabilita mientras está cargando
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                if (authState.isLoading) {
-                    // Muestra el indicador de carga
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp),
-                        color = MaterialTheme.colorScheme.onPrimary
-                    )
-                } else {
-                    Text("Ingresar")
-                }
-            }
-            Spacer(Modifier.height(12.dp))
-
-            // Botón para ir a la pantalla de registro
-            TextButton(onClick = onGoRegister) {
-                Text("¿No tienes cuenta? Regístrate")
-            }
         }
     }
 }

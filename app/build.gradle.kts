@@ -56,29 +56,41 @@ android {
 // --- SECCIÓN DE DEPENDENCIAS CORREGIDA ---
 // Aquí reemplazamos las versiones alfa/beta por las estables recomendadas.
 dependencies {
-    // Core y Activity
-    implementation("androidx.core:core-ktx:1.12.0") // Bajado de 1.17.0
-    implementation("androidx.activity:activity-compose:1.8.2") // Bajado de 1.11.0
 
-    // Lifecycle (ViewModel, etc.)
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0") // Versión estable
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0") // Bajado de 2.9.4
+    // Se define una versión consistente para todo el ciclo de vida (Lifecycle)    def lifecycle_version = "2.7.0" // Todas las librerías de lifecycle usarán ESTA versión.
+    val lifecycle_version = "2.7.0"
+    // --- CORE Y ACTIVITY ---
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.activity:activity-compose:1.8.2")
 
-    // Compose BOM (Bill of Materials) - Gestiona versiones de Compose
+    // --- LIFECYCLE (VIEWMODEL, ETC.) - ¡CORREGIDO! ---
+    // Todas las dependencias de lifecycle ahora están unificadas a la versión 2.7.0
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:$lifecycle_version")
+    // NOTA: lifecycle-runtime-compose es una librería más nueva que a veces causa conflictos.
+    // Con las dos líneas de arriba es suficiente para que viewModel() funcione. La eliminamos por seguridad.
+    // implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.6") // <-- ELIMINADA
+
+    // --- COMPOSE ---
+    // El BOM (Bill of Materials) gestiona las versiones de las librerías de Compose
     implementation(platform("androidx.compose:compose-bom:2024.02.01"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
-    // Navigation Compose
-    implementation("androidx.navigation:navigation-compose:2.7.7") // Bajado de 2.9.5
+    // --- NAVEGACIÓN ---
+    implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    // Íconos (Las dos librerías para tener todos los íconos)
+    // --- ÍCONOS ---
     implementation("androidx.compose.material:material-icons-core")
-    implementation("androidx.compose.material:material-icons-extended") // Ya la tenías, ahora funcionará
+    implementation("androidx.compose.material:material-icons-extended")
 
-    // Dependencias de Test (sin cambios, generalmente)
+    // --- OTRAS LIBRERÍAS ÚTILES ---
+    implementation("io.coil-kt:coil-compose:2.5.0") // Para imágenes
+    implementation("androidx.datastore:datastore-preferences:1.1.1") // Para guardar datos
+
+    // --- PRUEBAS (TESTING) ---
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
@@ -86,5 +98,4 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
-    implementation("io.coil-kt:coil-compose:2.5.0")
 }

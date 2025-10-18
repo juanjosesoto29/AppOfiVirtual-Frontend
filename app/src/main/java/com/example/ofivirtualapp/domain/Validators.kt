@@ -26,15 +26,21 @@ fun validatePhoneDigitsOnly(phone:String): String? {
 
 //validaciones para la seguridad de la contraseña
 fun validateStrongPass(pass: String): String? {
-    if(pass.isBlank()) return "Debes escribir tu contraseña"
-    if(pass.length < 8) return "Debe tener una logintud de más de 7 caracteres"
-    if(!pass.any { it.isUpperCase() }) return "Debe contener al menos una mayúscula"
-    if(!pass.any { it.isDigit() }) return "Debe contener al menos un número"
-    if(!pass.any { it.isLowerCase() }) return "Debe contener al menos una minúscula"
-    if(!pass.any { it.isLetterOrDigit() }) return "Debe contener al menos un caracter especial"
-    if(pass.contains(' ')) return "No puede contener espacios en blanco"
+    if (pass.isBlank()) return "Debes escribir tu contraseña"
+    if (pass.length < 8) return "Debe tener una longitud de más de 7 caracteres"
+    if (!pass.any { it.isUpperCase() }) return "Debe contener al menos una mayúscula"
+    if (!pass.any { it.isDigit() }) return "Debe contener al menos un número"
+    if (!pass.any { it.isLowerCase() }) return "Debe contener al menos una minúscula"
+
+    // --- 🔹 LÓGICA CORREGIDA Y ROBUSTA PARA CARACTERES ESPECIALES 🔹 ---
+    // Esto verifica que haya al menos un carácter que NO sea ni letra ni dígito.
+    if (pass.all { it.isLetterOrDigit() }) return "Debe contener al menos un caracter especial"
+    // --------------------------------------------------------------------
+
+    if (pass.contains(' ')) return "No puede contener espacios en blanco"
     return null
 }
+
 
 //validar que las claves coincidan
 fun validateConfirm(pass:String, confirm: String): String?{
