@@ -1,0 +1,2 @@
+OfiVirtual App es una aplicación móvil desarrollada en Kotlin con Jetpack Compose (Material 3) que permite a emprendedores y empresas gestionar sus servicios de oficina virtual, contabilidad y formalización de manera 100 % digital.
+Con un diseño moderno, navegación fluida y enfoque en la experiencia del usuario, centraliza todas las operaciones contables y tributarias en un solo lugar, optimizando la gestión empresarial en Chile.

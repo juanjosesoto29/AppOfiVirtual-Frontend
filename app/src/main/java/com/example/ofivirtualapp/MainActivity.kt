@@ -3,17 +3,21 @@ package com.example.ofivirtualapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.activity.enableEdgeToEdge
+// import androidx.activity.enableEdgeToEdge // 1. COMENTAMOS ESTA LÍNEA. Es la causa más probable del crash.
+
 import androidx.compose.runtime.Composable
-import com.example.ofivirtualapp.navigation.AppNavigation // 1. CAMBIO: Importa la función correcta
-import com.example.ofivirtualapp.ui.theme.OfiVirtualV3Theme // Asegúrate de importar tu tema
+import com.example.ofivirtualapp.navigation.AppNavigation
+import com.example.ofivirtualapp.ui.theme.OfiVirtualV3Theme // Usamos el tema que ya tienes y funciona.
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge() // Habilita el modo de pantalla completa (edge-to-edge)
+
+        // enableEdgeToEdge() // DESACTIVADO TEMPORALMENTE
+
         setContent {
-            // Llama a la función raíz de tu UI
+            // Llamamos directamente al Composable raíz que ya tienes.
+            // Esto respeta tu estructura original.
             AppRoot()
         }
     }
@@ -21,10 +25,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun AppRoot() {
-    // 2. CAMBIO: Usa el tema de tu aplicación que definiste
+    // Usamos el tema correcto que tú definiste.
     OfiVirtualV3Theme {
-        // 3. CAMBIO: Llama a tu función de navegación directamente.
-        // Ya no necesitas crear ni pasar el navController aquí.
+        // Tu NavGraph ya tiene un Scaffold interno, por lo que no necesita
+        // un Surface adicional aquí que pueda causar conflictos de dibujado.
+        // Simplemente llamamos a la navegación.
         AppNavigation()
     }
 }
