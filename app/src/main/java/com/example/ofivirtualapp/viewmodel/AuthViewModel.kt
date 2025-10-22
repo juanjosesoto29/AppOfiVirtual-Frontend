@@ -46,7 +46,7 @@ class AuthViewModel : ViewModel() {
     }
 
     // --- CORRECCIÓN 2: La función de registro ahora solo acepta nombre, email y password ---
-    fun register(email: String, password: String, name: String) {
+    fun register(email: String, password: String, name: String, phone: String) {
         viewModelScope.launch {
             authUiState = authUiState.copy(isLoading = true, error = null, registerSuccess = false)
             delay(1500)

@@ -4,9 +4,8 @@ import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
@@ -14,12 +13,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ofivirtualapp.domain.* // Importamos tus validadores
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
-import java.text.SimpleDateFormat
-import java.util.*
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -28,32 +27,29 @@ fun RegisterScreen(
     onGoLogin: () -> Unit,
     authViewModel: AuthViewModel = viewModel()
 ) {
+    // --- ESTADOS DE LOS CAMPOS ---
     var name by remember { mutableStateOf("") }
-    var birthDate by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
+
+    // --- ESTADOS DE VALIDACIÓN ---
+    var nameError by remember { mutableStateOf<String?>(null) }
+    var emailError by remember { mutableStateOf<String?>(null) }
+    var phoneError by remember { mutableStateOf<String?>(null) }
+    var passwordError by remember { mutableStateOf<String?>(null) }
+    var confirmPasswordError by remember { mutableStateOf<String?>(null) }
+
+    // --- LÓGICA DEL PREFIJO TELEFÓNICO ---
+    val countryCodes = listOf("+56", "+51", "+54", "+57", "+52") // Chile, Perú, Argentina, Colombia, México
+    var selectedPrefix by remember { mutableStateOf(countryCodes[0]) } // +56 por defecto
+    var isDropdownExpanded by remember { mutableStateOf(false) }
 
     val authState = authViewModel.authUiState
     val context = LocalContext.current
 
-    // --- Lógica para el DatePickerDialog ---
-    var showDatePicker by remember { mutableStateOf(false) }
-
-    // -->> CORRECCIÓN APLICADA AQUÍ <<--
-    // El estado del DatePicker DEBE ser recordado aquí, fuera del diálogo.
-    // Esto evita que se reinicie cada vez que el diálogo aparece.
-    val datePickerState = rememberDatePickerState()
-
-    // Este LaunchedEffect ahora funcionará correctamente porque `datePickerState` persiste.
-    LaunchedEffect(datePickerState.selectedDateMillis) {
-        datePickerState.selectedDateMillis?.let {
-            val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            birthDate = formatter.format(Date(it))
-        }
-    }
-
-    // El resto del código no cambia...
+    // Efecto para manejar la respuesta del ViewModel (éxito o error)
     LaunchedEffect(authState) {
         authState.error?.let {
             Toast.makeText(context, it, Toast.LENGTH_SHORT).show()
@@ -66,23 +62,16 @@ fun RegisterScreen(
         }
     }
 
-    if (showDatePicker) {
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Aceptar")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showDatePicker = false }) {
-                    Text("Cancelar")
-                }
-            }
-        ) {
-            // El diálogo ahora usa el estado que persiste fuera de él.
-            DatePicker(state = datePickerState)
-        }
+    // --- FUNCIÓN DE VALIDACIÓN ---
+    fun validateFields(): Boolean {
+        nameError = validateNameLettersOnly(name)
+        emailError = validateEmail(email)
+        phoneError = validatePhoneDigitsOnly(phone)
+        passwordError = validateStrongPass(password)
+        confirmPasswordError = validateConfirm(password, confirmPassword)
+
+        return nameError == null && emailError == null && phoneError == null &&
+                passwordError == null && confirmPasswordError == null
     }
 
     Box(
@@ -99,68 +88,112 @@ fun RegisterScreen(
             Text("Crear Cuenta", style = MaterialTheme.typography.headlineMedium)
             Spacer(Modifier.height(24.dp))
 
+            // --- CAMPO NOMBRE ---
             OutlinedTextField(
                 value = name,
-                onValueChange = { name = it },
+                onValueChange = { name = it; nameError = null },
                 label = { Text("Nombre completo") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = nameError != null,
+                supportingText = { if (nameError != null) Text(nameError!!) }
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(4.dp)) // Reducimos espacio
 
-            OutlinedTextField(
-                value = birthDate,
-                onValueChange = {},
-                readOnly = true,
-                label = { Text("Fecha de nacimiento") },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { showDatePicker = true },
-                trailingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Seleccionar fecha"
+            // --- CAMPO TELÉFONO CON PREFIJO ---
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.Top
+            ) {
+                // Dropdown para prefijos
+                ExposedDropdownMenuBox(
+                    expanded = isDropdownExpanded,
+                    onExpandedChange = { isDropdownExpanded = it }
+                ) {
+                    OutlinedTextField(
+                        value = selectedPrefix,
+                        onValueChange = {},
+                        readOnly = true,
+                        trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = isDropdownExpanded) },
+                        modifier = Modifier
+                            .menuAnchor() // Ancla el menú a este campo
+                            .width(120.dp)
                     )
+                    ExposedDropdownMenu(
+                        expanded = isDropdownExpanded,
+                        onDismissRequest = { isDropdownExpanded = false }
+                    ) {
+                        countryCodes.forEach { code ->
+                            DropdownMenuItem(
+                                text = { Text(code) },
+                                onClick = {
+                                    selectedPrefix = code
+                                    isDropdownExpanded = false
+                                }
+                            )
+                        }
+                    }
                 }
-            )
-            Spacer(Modifier.height(12.dp))
 
+                Spacer(Modifier.width(8.dp))
+
+                // Campo para el número
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { phone = it; phoneError = null },
+                    label = { Text("Teléfono") },
+                    modifier = Modifier.weight(1f),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = phoneError != null,
+                    supportingText = { if (phoneError != null) Text(phoneError!!) }
+                )
+            }
+            Spacer(Modifier.height(4.dp))
+
+            // --- CAMPO EMAIL ---
             OutlinedTextField(
                 value = email,
-                onValueChange = { email = it },
+                onValueChange = { email = it; emailError = null },
                 label = { Text("Correo electrónico") },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                isError = emailError != null,
+                supportingText = { if (emailError != null) Text(emailError!!) }
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(4.dp))
 
+            // --- CAMPO CONTRASEÑA ---
             OutlinedTextField(
                 value = password,
-                onValueChange = { password = it },
+                onValueChange = { password = it; passwordError = null },
                 label = { Text("Contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                isError = passwordError != null,
+                supportingText = { if (passwordError != null) Text(passwordError!!) }
             )
-            Spacer(Modifier.height(12.dp))
+            Spacer(Modifier.height(4.dp))
 
+            // --- CAMPO CONFIRMAR CONTRASEÑA ---
             OutlinedTextField(
                 value = confirmPassword,
-                onValueChange = { confirmPassword = it },
+                onValueChange = { confirmPassword = it; confirmPasswordError = null },
                 label = { Text("Confirmar contraseña") },
                 visualTransformation = PasswordVisualTransformation(),
-                isError = password != confirmPassword,
+                isError = confirmPasswordError != null,
+                supportingText = { if (confirmPasswordError != null) Text(confirmPasswordError!!) },
                 modifier = Modifier.fillMaxWidth()
             )
             Spacer(Modifier.height(24.dp))
 
+            // --- BOTÓN DE REGISTRO ---
             Button(
                 onClick = {
-                    authViewModel.register(email, password, name)
+                    if (validateFields()) {
+                        val fullPhoneNumber = selectedPrefix + phone
+                        authViewModel.register(email, password, name, fullPhoneNumber)
+                    }
                 },
-                enabled = !authState.isLoading &&
-                        password == confirmPassword &&
-                        email.isNotBlank() &&
-                        password.isNotBlank() &&
-                        name.isNotBlank() &&
-                        birthDate.isNotBlank(),
+                enabled = !authState.isLoading,
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (authState.isLoading) {
