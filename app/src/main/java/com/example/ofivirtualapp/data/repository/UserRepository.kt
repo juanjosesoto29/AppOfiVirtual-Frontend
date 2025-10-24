@@ -1,5 +1,6 @@
 package com.example.ofivirtualapp.data.repository
 
+
 import com.example.uinavegacion.data.local.user.UserDao       // DAO de usuario
 import com.example.ofivirtualapp.data.local.user.UserEntity    // Entidad de usuario
 
@@ -34,4 +35,5 @@ class UserRepository(
         )
         return Result.success(id)                                    // Devuelve ID generado
     }
+
 }

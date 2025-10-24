@@ -90,8 +90,13 @@ fun PerfilScreen(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             if (isGranted) {
-                tempCameraUri = context.createImageUri() // Crear URI antes de lanzar la cámara
-                cameraLauncher.launch(tempCameraUri)
+                // 1. CREAMOS UNA COPIA LOCAL DE LA URI.
+                // Esto le asegura al compilador que la variable no cambiará.
+                val localUri = tempCameraUri
+                if (localUri != null) {
+                    // 2. USAMOS LA COPIA LOCAL SEGURA.
+                    cameraLauncher.launch(localUri)
+                }
             }
         }
     )
@@ -115,7 +120,14 @@ fun PerfilScreen(
                 ListTile(
                     icon = Icons.Outlined.PhotoCamera,
                     text = "Tomar foto",
-                    onClick = { cameraPermissionLauncher.launch(Manifest.permission.CAMERA) }
+                    onClick = {
+                        // 1. PRIMERO, creamos una URI para guardar la foto.
+                        val uri = context.createImageUri()
+                        tempCameraUri = uri
+                        // 2. LUEGO, solicitamos el permiso para la cámara.
+                        // El lanzador de permisos se encargará de llamar a la cámara.
+                        cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                    }
                 )
                 ListTile(
                     icon = Icons.Outlined.PhotoLibrary,

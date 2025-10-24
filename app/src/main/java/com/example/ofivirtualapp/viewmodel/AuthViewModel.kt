@@ -181,4 +181,5 @@ class AuthViewModel(
     fun clearRegisterResult() {                             // Limpia banderas tras navegar
         _register.update { it.copy(success = false, errorMsg = null) }
     }
+
 }

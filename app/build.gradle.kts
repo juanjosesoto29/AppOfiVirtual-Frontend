@@ -1,9 +1,9 @@
 plugins {
-    // Estas líneas usan el catálogo de versiones (libs.versions.toml), lo cual es correcto.
-    // Si tu proyecto no lo tiene, las siguientes líneas también funcionarán.
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    id("com.google.devtools.ksp") version "2.0.21-1.0.25"
+
 }
 
 android {
@@ -79,6 +79,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.12.0")
     implementation("androidx.activity:activity-compose:1.8.2")
 
+
     // --- LIFECYCLE (VIEWMODEL, ETC.) - ¡CORREGIDO! ---
     // Todas las dependencias de lifecycle ahora están unificadas a la versión 2.7.0
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
@@ -110,12 +111,11 @@ dependencies {
     implementation("androidx.room:room-runtime:2.6.1")    // <-- NUEVO
     implementation("androidx.room:room-ktx:2.6.1")        // <-- NUEVO
 
-    // <-- NUEVO
+    ksp("androidx.room:room-compiler:2.6.1")// <-- NUEVO
 
     //manipular la carga de imagenes en el cache temporal
     implementation("io.coil-kt:coil-compose:2.7.0")
-
-
+    
 
     // --- PRUEBAS (TESTING) ---
     testImplementation("junit:junit:4.13.2")
@@ -125,4 +125,5 @@ dependencies {
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
+
 }
