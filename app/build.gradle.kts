@@ -8,12 +8,12 @@ plugins {
 
 android {
     namespace = "com.example.ofivirtualapp"
-    compileSdk = 34 // <-- CORRECTO: SDK Estable.
+    compileSdk = 36 // <-- CORRECTO: SDK Estable.
 
     defaultConfig {
         applicationId = "com.example.ofivirtualapp"
         minSdk = 24
-        targetSdk = 34 // <-- CORRECTO: SDK Estable.
+        targetSdk = 36 // <-- CORRECTO: SDK Estable.
         versionCode = 1
         versionName = "1.0"
 
@@ -57,6 +57,22 @@ android {
 // Aquí reemplazamos las versiones alfa/beta por las estables recomendadas.
 dependencies {
 
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.activity.compose)
+    implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.ui.graphics)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    implementation(libs.androidx.compose.material3)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
+    implementation(libs.androidx.room.common.jvm)
     // Se define una versión consistente para todo el ciclo de vida (Lifecycle)    def lifecycle_version = "2.7.0" // Todas las librerías de lifecycle usarán ESTA versión.
     val lifecycle_version = "2.7.0"
     // --- CORE Y ACTIVITY ---
@@ -79,6 +95,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
 
+
     // --- NAVEGACIÓN ---
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
@@ -89,6 +106,16 @@ dependencies {
     // --- OTRAS LIBRERÍAS ÚTILES ---
     implementation("io.coil-kt:coil-compose:2.5.0") // Para imágenes
     implementation("androidx.datastore:datastore-preferences:1.1.1") // Para guardar datos
+    // Room (SQLite) - runtime y extensiones KTX
+    implementation("androidx.room:room-runtime:2.6.1")    // <-- NUEVO
+    implementation("androidx.room:room-ktx:2.6.1")        // <-- NUEVO
+
+    // <-- NUEVO
+
+    //manipular la carga de imagenes en el cache temporal
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
+
 
     // --- PRUEBAS (TESTING) ---
     testImplementation("junit:junit:4.13.2")
