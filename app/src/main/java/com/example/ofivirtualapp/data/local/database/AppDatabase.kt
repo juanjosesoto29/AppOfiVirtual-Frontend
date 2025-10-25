@@ -5,7 +5,7 @@ import androidx.room.Database                                   // Anotación @D
 import androidx.room.Room                                       // Builder de DB
 import androidx.room.RoomDatabase                               // Clase base de DB
 import androidx.sqlite.db.SupportSQLiteDatabase                 // Tipo del callback onCreate
-import com.example.uinavegacion.data.local.user.UserDao         // Import del DAO de usuario
+import com.example.ofivirtualapp.data.local.user.UserDao         // Import del DAO de usuario
 import com.example.ofivirtualapp.data.local.user.UserEntity      // Import de la entidad de usuario
 import kotlinx.coroutines.CoroutineScope                        // Para corrutinas en callback
 import kotlinx.coroutines.Dispatchers                           // Dispatcher IO

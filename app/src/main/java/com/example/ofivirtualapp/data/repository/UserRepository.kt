@@ -1,7 +1,7 @@
 package com.example.ofivirtualapp.data.repository
 
 
-import com.example.uinavegacion.data.local.user.UserDao       // DAO de usuario
+import com.example.ofivirtualapp.data.local.user.UserDao       // DAO de usuario
 import com.example.ofivirtualapp.data.local.user.UserEntity    // Entidad de usuario
 
 // Repositorio: orquesta reglas de negocio para login/registro sobre el DAO.

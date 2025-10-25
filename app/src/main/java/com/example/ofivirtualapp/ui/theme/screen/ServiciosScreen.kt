@@ -21,6 +21,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ofivirtualapp.navigation.Route
+import com.example.ofivirtualapp.ui.theme.screen.ServicioUI
+import com.example.ofivirtualapp.ui.theme.screen.CategoriaServicio
+
 
 @Composable
 fun ServiciosScreen(
@@ -159,8 +162,13 @@ fun ServiciosScreen(
         ordenCategorias.forEachIndexed { i, categoria ->
             val lista = agrupado[categoria].orEmpty()
             if (lista.isNotEmpty()) {
+                // REEMPLAZA EL TEXT ANTERIOR CON ESTE BLOQUE 'WHEN'
                 Text(
-                    text = categoria.titulo,
+                    text = when (categoria) {
+                        CategoriaServicio.OFICINA_VIRTUAL -> "Oficina Virtual"
+                        CategoriaServicio.FORMALIZACION -> "Formalización"
+                        CategoriaServicio.CONTABILIDAD -> "Contabilidad"
+                    },
                     style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold)
                 )
                 Spacer(Modifier.height(10.dp))
@@ -206,21 +214,6 @@ fun ServiciosScreen(
     }
 }
 
-/* ----------------- Model ----------------- */
-
-enum class CategoriaServicio(val titulo: String) {
-    OFICINA_VIRTUAL("Oficina Virtual"),
-    FORMALIZACION("Formalización"),
-    CONTABILIDAD("Contabilidad")
-}
-
-data class ServicioUI(
-    val categoria: CategoriaServicio,
-    val nombre: String,
-    val descripcion: String,
-    val precioCLP: Int,
-    val esPorPersona: Boolean = false // NUEVO: Identificador
-)
 
 /* ----------------- UI ----------------- */
 

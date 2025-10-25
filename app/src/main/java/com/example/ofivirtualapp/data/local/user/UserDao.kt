@@ -1,10 +1,9 @@
-package com.example.uinavegacion.data.local.user
+package com.example.ofivirtualapp.data.local.user
 
 import androidx.room.Dao                       // Marca esta interfaz como DAO de Room
 import androidx.room.Insert                    // Para insertar filas
 import androidx.room.OnConflictStrategy        // Estrategia de conflicto en inserción
 import androidx.room.Query                     // Para queries SQL
-import com.example.ofivirtualapp.data.local.user.UserEntity
 
 // @Dao indica que define operaciones para la tabla users.
 @Dao
