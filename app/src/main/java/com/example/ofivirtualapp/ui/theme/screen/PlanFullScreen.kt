@@ -29,6 +29,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.material3.HorizontalDivider
 
 // --- Modelos de datos para esta pantalla ---
 private data class PlanOption(val nombre: String, val precio: Int, val precioOriginal: Int? = null)
@@ -246,7 +247,7 @@ fun PlanFullScreen(
                             }
                         }
                     }
-                    Divider(Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
+                    HorizontalDivider(Modifier.padding(vertical = 8.dp, horizontal = 16.dp))
                     Row(
                         Modifier
                             .fillMaxWidth()
@@ -295,7 +296,7 @@ fun PlanFullScreen(
                     // --- Separador y totales (solo si hay items) ---
                     if (puedeAgregarAlCarrito) { // puedeAgregarAlCarrito es 'precioFinal > 0'
                         Spacer(Modifier.height(12.dp))
-                        Divider()
+                        HorizontalDivider()
                         Spacer(Modifier.height(12.dp))
 
                         // Muestra el total sin descuento SOLO si hay un descuento aplicado

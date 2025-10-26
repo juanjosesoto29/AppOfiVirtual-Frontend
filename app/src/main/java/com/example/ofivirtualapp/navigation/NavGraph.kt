@@ -35,6 +35,8 @@ import com.example.ofivirtualapp.viewmodel.AuthViewModel
 import com.example.ofivirtualapp.viewmodel.CartViewModel
 import com.example.ofivirtualapp.viewmodel.PerfilViewModel
 import kotlinx.coroutines.launch
+// Agrega esta línea junto con tus otros imports de 'androidx.compose.ui.platform'
+import androidx.compose.ui.platform.LocalUriHandler
 
 @Composable
 fun AppNavGraph(authViewModel: AuthViewModel) { // Corregido: Nombre del Composable
@@ -54,6 +56,7 @@ fun AppNavGraph(authViewModel: AuthViewModel) { // Corregido: Nombre del Composa
     }
 
     val context = LocalContext.current
+    val uriHandler = LocalUriHandler.current
     val userPrefs = remember { UserPreferences(context) }
     val scope = rememberCoroutineScope()
 
@@ -93,8 +96,21 @@ fun AppNavGraph(authViewModel: AuthViewModel) { // Corregido: Nombre del Composa
                     onGoOficinaVirtual = { goTo(Route.OficinaVirtual.path) },
                     onGoContabilidad = { goTo(Route.Contabilidad.path) },
                     onGoFormalizacion = { goTo(Route.Formalizacion.path) },
-                    onOpenContrato1 = {},
-                    onOpenContrato2 = {}
+                    onOpenContrato1 = { url ->
+                        try {
+                            uriHandler.openUri(url)
+                        } catch (e: Exception) {
+                            // Opcional: Mostrar un Toast si no se puede abrir la URL
+                            Toast.makeText(context, "No se ha cargado el contrato", Toast.LENGTH_SHORT).show()
+                        }
+                    },
+                    onOpenContrato2 = { url ->
+                        try {
+                            uriHandler.openUri(url)
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "No se ha cargado el contrato", Toast.LENGTH_SHORT).show()
+                        }
+                    }
                 )
             }
             composable(Route.Login.path) {

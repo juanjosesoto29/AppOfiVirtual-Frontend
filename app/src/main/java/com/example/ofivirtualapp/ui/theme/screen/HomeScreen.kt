@@ -34,7 +34,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ofivirtualapp.R
 import com.example.ofivirtualapp.navigation.Route // Importa TU clase Route
-
+import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.material3.HorizontalDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,8 +49,8 @@ fun HomeScreen(
     onGoOficinaVirtual: () -> Unit,
     onGoContabilidad: () -> Unit,
     onGoFormalizacion: () -> Unit,
-    onOpenContrato1: () -> Unit,
-    onOpenContrato2: () -> Unit,
+    onOpenContrato1: (String) -> Unit,
+    onOpenContrato2: (String) -> Unit,
 ) {
 
     val ofiBlue = Color(0xFF071290)
@@ -113,7 +114,7 @@ fun HomeScreen(
                                 onClick = { handleMenuClick(Route.AcercaDe.path) },
                                 leadingIcon = { Icon(Icons.Outlined.Info, null) }
                             )
-                            Divider()
+                            HorizontalDivider()
                             DropdownMenuItem(
                                 text = { Text("Cerrar Sesión") },
                                 onClick = {
@@ -226,7 +227,7 @@ fun HomeScreen(
                 subtitle = "Emitido 13/12/2024",
                 chipLabel = "VIGENTE",
                 chipBg = badgeGreen,
-                onClick = onOpenContrato1
+                onClick = { onOpenContrato1("https://drive.google.com/file/d/1U2JMb9S1laCQOtB8c9JCX0pNOb5TrzFl/view?usp=sharing") }
             )
             Spacer(Modifier.height(10.dp))
             ContractItem(
@@ -235,7 +236,7 @@ fun HomeScreen(
                 subtitle = "Emitido 05/03/2025",
                 chipLabel = "VENCIDO",
                 chipBg = badgeGrey,
-                onClick = onOpenContrato2
+                onClick = { onOpenContrato2("https://ofivirtual.cl/contrato-ejemplo-1.pdf") }
             )
 
             Spacer(Modifier.height(24.dp))
@@ -322,47 +323,34 @@ private fun ContractItem(
     onClick: () -> Unit
 ) {
     Card(
-        onClick = onClick,
-        shape = RoundedCornerShape(14.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
+        onClick = onClick, // ¡Aquí está la magia! Toda la tarjeta es ahora un botón.
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(horizontal = 12.dp, vertical = 10.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(40.dp)
                     .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.primary),
+                    .background(MaterialTheme.colorScheme.primaryContainer),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    iconLetter,
-                    color = Color.White,
-                    fontWeight = FontWeight.Bold
-                )
+                Text(iconLetter, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onPrimaryContainer)
             }
             Spacer(Modifier.width(12.dp))
             Column(Modifier.weight(1f)) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.SemiBold),
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
+                Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
+                Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            Spacer(Modifier.width(8.dp))
             StatusChip(label = chipLabel, bg = chipBg, fg = Color.White)
         }
     }
 }
+
