@@ -33,6 +33,7 @@ sealed class Route(val path: String) {
     object AcercaDe : Route("acerca_de")
     object PlanFull : Route("plan_full")
     object Checkout : Route("checkout/{total}")
+    object MisContratos : Route("mis_contratos")
 
 
 }

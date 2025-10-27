@@ -151,11 +151,7 @@ fun PerfilScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Perfil", fontWeight = FontWeight.SemiBold) },
-                actions = {
-                    IconButton(onClick = onEditarPerfil) {
-                        Icon(Icons.Outlined.Edit, contentDescription = "Editar perfil")
-                    }
-                }
+
             )
         }
     ) { innerPadding ->
@@ -259,7 +255,6 @@ fun PerfilScreen(
 
             /* --- Opciones --- */
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
-                PerfilItem( icon = Icons.Outlined.Person, title = "Mis datos", subtitle = "Nombre, email y teléfono", onClick = onVerMisDatos)
                 PerfilItem( icon = Icons.Outlined.Description, title = "Contratos", subtitle = "Documentos y estados", onClick = onVerContratos)
                 PerfilItem( icon = Icons.Outlined.CreditCard, title = "Métodos de pago", subtitle = "Tarjetas y medios guardados", onClick = onMetodosPago)
                 PerfilItem( icon = Icons.Outlined.NotificationsNone, title = "Notificaciones", subtitle = "Preferencias y alertas", onClick = onNotificaciones)

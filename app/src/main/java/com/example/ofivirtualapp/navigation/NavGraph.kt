@@ -87,13 +87,12 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                     onGoTo = goTo,
                     onLogout = {
                         scope.launch {
-                            // 🔹 REEMPLAZA setLoggedIn(false) CON clearSession() 🔹
                             userPrefs.clearSession()
                             navigateAndClearStack(Route.Onboarding.path)
                         }
                     },
                     // Pasamos lambdas vacías para los parámetros no usados para evitar errores
-                    onRenewPlan = { goTo(Route.Servicios.path) },
+                    onRenewPlan = { goTo(Route.OficinaVirtual.path) },
                     onGoOficinaVirtual = { goTo(Route.OficinaVirtual.path) },
                     onGoContabilidad = { goTo(Route.Contabilidad.path) },
                     onGoFormalizacion = { goTo(Route.Formalizacion.path) },
@@ -135,14 +134,27 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                     perfilViewModel = perfilViewModel,
                     uiState = perfilState, // Pasamos el estado
                     onAvatarChange = { perfilViewModel.onAvatarChange(it) },
+                    onVerContratos = { goTo(Route.MisContratos.path) },
                     onMetodosPago = { goTo(Route.MetodosPago.path) },
                     onNotificaciones = { goTo(Route.Notificaciones.path) },
                     onAyuda = { goTo(Route.Soporte.path) },
-                    onRenovarPlan = { goTo(Route.Servicios.path) },
+                    onRenovarPlan = { goTo(Route.OficinaVirtual.path) },
                     onCerrarSesion = {
                         scope.launch {
                             userPrefs.clearSession()
                             navigateAndClearStack(Route.Onboarding.path)
+                        }
+                    }
+                )
+            }
+            composable(Route.MisContratos.path) {
+                MisContratosScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onOpenContrato = { url ->
+                        try {
+                            uriHandler.openUri(url) // Reutilizamos el uriHandler
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "No se pudo abrir el contrato", Toast.LENGTH_SHORT).show()
                         }
                     }
                 )
@@ -216,7 +228,19 @@ fun AppNavGraph(authViewModel: AuthViewModel,
             // 🔹 FIN DE LA CORRECCIÓN 🔹
 
             composable(Route.Notificaciones.path) { NotificacionesScreen(onNavigateBack = { navController.popBackStack() }) }
-            composable(Route.MetodosPago.path) { PlaceholderScreen("EN PROCESO", navController) }
+            composable(Route.MetodosPago.path) {
+                MetodosPagoScreen(
+                    onNavigateBack = { navController.popBackStack() },
+                    onOpenWhatsApp = { url ->
+                        try {
+                            // Reutilizamos el uriHandler que ya está disponible en este scope
+                            uriHandler.openUri(url)
+                        } catch (e: Exception) {
+                            Toast.makeText(context, "No se pudo abrir WhatsApp", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                )
+            }
             composable(Route.FAQ.path) { FaqScreen(onNavigateBack = { navController.popBackStack() }) }
             composable(Route.Soporte.path) {
                 SoporteScreen(
