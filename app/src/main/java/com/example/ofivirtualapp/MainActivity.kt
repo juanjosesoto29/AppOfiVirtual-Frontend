@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 // import androidx.activity.enableEdgeToEdge // 1. COMENTAMOS ESTA LÍNEA. Es la causa más probable del crash.
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
@@ -14,7 +15,10 @@ import com.example.ofivirtualapp.ui.theme.OfiVirtualV3Theme
 import com.example.ofivirtualapp.data.local.database.AppDatabase
 import com.example.ofivirtualapp.data.repository.UserRepository
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
-import com.example.ofivirtualapp.viewmodel.AuthViewModelFactory// Usamos el tema que ya tienes y funciona.
+import com.example.ofivirtualapp.viewmodel.AuthViewModelFactory
+import com.example.ofivirtualapp.data.local.storage.UserPreferences
+import com.example.ofivirtualapp.viewmodel.PerfilViewModel
+import com.example.ofivirtualapp.viewmodel.PerfilViewModelFactory// Usamos el tema que ya tienes y funciona.
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +46,7 @@ fun AppRoot() {
             )
         )
     )
-
+    val userPreferences = remember { UserPreferences(context) }
     // ^ Obtenemos el applicationContext para construir la base de datos de Room.
 
     val db = AppDatabase.getInstance(context)
@@ -56,6 +60,9 @@ fun AppRoot() {
 
 
     // ^ Creamos el ViewModel con factory para inyectar el repositorio.
+    val perfilViewModel: PerfilViewModel = viewModel(
+        factory = PerfilViewModelFactory(userRepository, userPreferences)
+    )
     //   Esto reemplaza cualquier uso anterior de listas en memoria (USERS).
 
     // ====== TU NAVEGACIÓN ORIGINAL ======
@@ -64,6 +71,9 @@ fun AppRoot() {
         // Tu NavGraph ya tiene un Scaffold interno, por lo que no necesita
         // un Surface adicional aquí que pueda causar conflictos de dibujado.
         // Simplemente llamamos a la navegación.
-        AppNavGraph(authViewModel = authViewModel)
+        AppNavGraph(
+            authViewModel = authViewModel,
+            perfilViewModel = perfilViewModel // Añadimos el nuevo parámetro
+        )
     }
 }

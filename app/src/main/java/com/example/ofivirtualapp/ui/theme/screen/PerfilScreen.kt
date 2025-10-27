@@ -34,12 +34,14 @@ import com.example.ofivirtualapp.viewmodel.PerfilUiState
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import com.example.ofivirtualapp.viewmodel.PerfilViewModel
 
 /* ================== PANTALLA PRINCIPAL ================== */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilScreen(
+    perfilViewModel: PerfilViewModel,
     uiState: PerfilUiState, // Recibimos el estado completo del ViewModel
     onAvatarChange: (Uri?) -> Unit,
     onEditarPerfil: () -> Unit = {},
@@ -51,6 +53,10 @@ fun PerfilScreen(
     onRenovarPlan: () -> Unit = {},
     onCerrarSesion: () -> Unit = {}
 ) {
+    LaunchedEffect(Unit) {
+        perfilViewModel.loadUserProfile()
+    }
+
     val OfiBlue = Color(0xFF071290)
     val BadgeGreen = Color(0xFF34C759)
     val context = LocalContext.current

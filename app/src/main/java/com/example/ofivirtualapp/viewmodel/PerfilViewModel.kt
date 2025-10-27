@@ -1,33 +1,69 @@
 package com.example.ofivirtualapp.viewmodel
 
 import android.net.Uri
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
-import androidx.compose.runtime.State
+import androidx.lifecycle.viewModelScope
+import com.example.ofivirtualapp.data.local.storage.UserPreferences
+import com.example.ofivirtualapp.data.repository.UserRepository
 import com.example.ofivirtualapp.ui.theme.screen.UserProfile
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 
-// Estado de la UI para la pantalla de Perfil
+// El estado de la UI ahora empieza vacío o con un estado de carga
 data class PerfilUiState(
-    val user: UserProfile = UserProfile(
-        nombre = "Juanjose Soto",
-        email = "juanjo@ofivirtual.cl",
-        telefono = "+56 9 1234 5678",
-        planNombre = "Plan Semestral",
-        planEstadoVigente = true,
-        planVence = "13/03"
-    ),
-    val avatarUri: Uri? = null // URI de la imagen seleccionada
+    val user: UserProfile = UserProfile(nombre = "Cargando...", email = "", telefono = "", planNombre = "", planEstadoVigente = false, planVence = ""),
+    val avatarUri: Uri? = null,
+    val isLoading: Boolean = true
 )
 
-class PerfilViewModel : ViewModel() {
+// 🔹 1. AHORA RECIBE DEPENDENCIAS 🔹
+class PerfilViewModel(
+    private val userRepository: UserRepository,
+    private val userPreferences: UserPreferences
+) : ViewModel() {
 
-    private val _uiState = mutableStateOf(PerfilUiState())
-    val uiState: State<PerfilUiState> = _uiState
+    private val _uiState = MutableStateFlow(PerfilUiState())
+    val uiState = _uiState.asStateFlow()
 
-    /**
-     * Actualiza el URI del avatar en el estado de la UI.
-     */
+    fun loadUserProfile() {
+        // Ponemos el estado en "Cargando" al empezar
+        _uiState.update { it.copy(isLoading = true) }
+        viewModelScope.launch {
+            // Leemos el email de las preferencias
+            val email = userPreferences.userEmail.firstOrNull()
+            if (email != null) {
+                // Buscamos el usuario en la base de datos
+                val userEntity = userRepository.getUserByEmail(email)
+                if (userEntity != null) {
+                    // Actualizamos la UI con los datos reales
+                    _uiState.update { currentState ->
+                        currentState.copy(
+                            user = UserProfile(
+                                nombre = userEntity.name,
+                                email = userEntity.email,
+                                telefono = userEntity.phone,
+                                planNombre = "Plan Semestral",
+                                planEstadoVigente = true,
+                                planVence = "13/03/2026"
+                            ),
+                            isLoading = false
+                        )
+                    }
+                } else {
+                    // Si el email existe pero el usuario no está en la BD (caso raro)
+                    _uiState.update { it.copy(isLoading = false, user = it.user.copy(nombre = "Usuario no encontrado")) }
+                }
+            } else {
+                // Caso error: no se encontró email
+                _uiState.update { it.copy(isLoading = false, user = it.user.copy(nombre = "Error al cargar")) }
+            }
+        }
+    }
+
+    // La función de cambiar avatar no cambia
     fun onAvatarChange(uri: Uri?) {
-        _uiState.value = _uiState.value.copy(avatarUri = uri)
+        _uiState.update { currentState ->
+            currentState.copy(avatarUri = uri)
+        }
     }
 }

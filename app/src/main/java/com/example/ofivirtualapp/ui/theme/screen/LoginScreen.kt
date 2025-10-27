@@ -23,15 +23,16 @@ import com.example.ofivirtualapp.viewmodel.AuthViewModel
 @Composable
 fun LoginScreenVm(
     vm: AuthViewModel,
+    userPrefs: UserPreferences,
     onLoginOkNavigateHome: () -> Unit,
     onGoRegister: () -> Unit
 ) {
     val state by vm.login.collectAsStateWithLifecycle()
-    val context = LocalContext.current
-    val userPrefs = remember { UserPreferences(context) }
 
     LaunchedEffect(state.success) {
         if (state.success) {
+            // Ahora 'userPrefs' es el que se recibe por parámetro (la instancia correcta)
+            userPrefs.saveUserEmail(state.email)
             userPrefs.setLoggedIn(true)
             vm.clearLoginResult()
             onLoginOkNavigateHome()
@@ -71,10 +72,7 @@ private fun LoginScreen(
 ) {
     var showPass by remember { mutableStateOf(false) }
 
-    // 🔹 PREGUNTA: ¿Y EN QUÉ PARTE PONES MI ESTILO? 🔹
-    // RESPUESTA: ¡AQUÍ MISMO! Al usar `Scaffold`, este componente aplica
-    // automáticamente el color de fondo definido en tu `OfiVirtualV3Theme`.
-    // No necesita un .background() manual.
+
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier

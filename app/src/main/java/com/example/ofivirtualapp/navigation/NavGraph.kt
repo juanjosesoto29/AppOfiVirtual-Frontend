@@ -39,11 +39,11 @@ import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalUriHandler
 
 @Composable
-fun AppNavGraph(authViewModel: AuthViewModel) { // Corregido: Nombre del Composable
+fun AppNavGraph(authViewModel: AuthViewModel,
+                perfilViewModel: PerfilViewModel) { // Corregido: Nombre del Composable
 
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
-    val perfilViewModel: PerfilViewModel = viewModel()
 
     val goTo: (String) -> Unit = { route -> navController.navigate(route) }
     val goHome: () -> Unit = { navController.navigate(Route.Home.path) }
@@ -87,7 +87,8 @@ fun AppNavGraph(authViewModel: AuthViewModel) { // Corregido: Nombre del Composa
                     onGoTo = goTo,
                     onLogout = {
                         scope.launch {
-                            userPrefs.setLoggedIn(false)
+                            // 🔹 REEMPLAZA setLoggedIn(false) CON clearSession() 🔹
+                            userPrefs.clearSession()
                             navigateAndClearStack(Route.Onboarding.path)
                         }
                     },
@@ -116,6 +117,7 @@ fun AppNavGraph(authViewModel: AuthViewModel) { // Corregido: Nombre del Composa
             composable(Route.Login.path) {
                 LoginScreenVm(
                     vm = authViewModel,
+                    userPrefs = userPrefs, // 🔹 PASA LA INSTANCIA CORRECTA
                     onLoginOkNavigateHome = { navigateAndClearStack(Route.Home.path) },
                     onGoRegister = goRegister
                 )
@@ -128,8 +130,9 @@ fun AppNavGraph(authViewModel: AuthViewModel) { // Corregido: Nombre del Composa
                 )
             }
             composable(Route.Perfil.path) {
-                val perfilState by perfilViewModel.uiState // State se accede con .value
+                val perfilState by perfilViewModel.uiState.collectAsState() // State se accede con .value
                 PerfilScreen(
+                    perfilViewModel = perfilViewModel,
                     uiState = perfilState, // Pasamos el estado
                     onAvatarChange = { perfilViewModel.onAvatarChange(it) },
                     onMetodosPago = { goTo(Route.MetodosPago.path) },
@@ -138,8 +141,8 @@ fun AppNavGraph(authViewModel: AuthViewModel) { // Corregido: Nombre del Composa
                     onRenovarPlan = { goTo(Route.Servicios.path) },
                     onCerrarSesion = {
                         scope.launch {
-                            userPrefs.setLoggedIn(false) // Borra la preferencia
-                            navigateAndClearStack(Route.Onboarding.path) // Navega al Onboarding
+                            userPrefs.clearSession()
+                            navigateAndClearStack(Route.Onboarding.path)
                         }
                     }
                 )

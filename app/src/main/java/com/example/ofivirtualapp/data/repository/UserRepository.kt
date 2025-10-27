@@ -35,5 +35,8 @@ class UserRepository(
         )
         return Result.success(id)                                    // Devuelve ID generado
     }
+    suspend fun getUserByEmail(email: String): UserEntity? {
+        return userDao.getByEmail(email)
+    }
 
 }
