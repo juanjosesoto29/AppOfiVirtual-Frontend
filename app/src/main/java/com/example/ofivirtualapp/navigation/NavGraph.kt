@@ -177,7 +177,6 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                     }
                 )
             }
-            composable(Route.PasswordRecovery.path) { PlaceholderScreen("Recuperar Contraseña", navController) }
 
             composable(Route.OficinaVirtual.path) {
                 OficinaVirtualScreen(onAddToCart = { planOV ->

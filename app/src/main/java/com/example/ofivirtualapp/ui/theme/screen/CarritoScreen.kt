@@ -29,8 +29,7 @@ fun CarritoScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Mi Carrito", fontWeight = FontWeight.SemiBold) },
-                navigationIcon = { IconButton(onClick = {}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } }
+                title = { Text("Mi Carrito", fontWeight = FontWeight.SemiBold) }
             )
         },
         bottomBar = {
