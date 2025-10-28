@@ -8,7 +8,6 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-// Imports para los íconos del menú (TODOS INCLUIDOS)
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.ExitToApp
 import androidx.compose.material.icons.outlined.Info
@@ -16,9 +15,7 @@ import androidx.compose.material.icons.outlined.MoreVert
 import androidx.compose.material.icons.outlined.Notifications
 import androidx.compose.material.icons.outlined.Quiz
 import androidx.compose.material.icons.outlined.SupportAgent
-// Imports para los componentes de Material 3
 import androidx.compose.material3.*
-// Imports para el estado de Compose (remember, mutableStateOf)
 import androidx.compose.runtime.*
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -33,18 +30,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ofivirtualapp.R
-import com.example.ofivirtualapp.navigation.Route // Importa TU clase Route
+import com.example.ofivirtualapp.navigation.Route
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.material3.HorizontalDivider
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
-    // Nuevas funciones para el menú y logout
     onGoTo: (String) -> Unit,
     onLogout: () -> Unit,
-
-    // Funciones que ya tenías
     onRenewPlan: () -> Unit,
     onGoOficinaVirtual: () -> Unit,
     onGoContabilidad: () -> Unit,
@@ -65,13 +59,12 @@ fun HomeScreen(
                         Image(
                             painter = painterResource(R.drawable.ofivirtual_logo_solo),
                             contentDescription = "OfiVirtual",
-                            modifier = Modifier.height(36.dp), // Tamaño actual
+                            modifier = Modifier.height(36.dp),
                             contentScale = ContentScale.Fit
                         )
                     }
                 },
                 actions = {
-                    // Estado para controlar la visibilidad del menú
                     var menuExpanded by remember { mutableStateOf(false) }
 
                     Box {
@@ -79,7 +72,6 @@ fun HomeScreen(
                             Icon(Icons.Outlined.MoreVert, contentDescription = "Más opciones")
                         }
 
-                        // Menú desplegable con las nuevas opciones
                         DropdownMenu(
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false }
@@ -236,7 +228,7 @@ fun HomeScreen(
                 subtitle = "Emitido 05/03/2025",
                 chipLabel = "VENCIDO",
                 chipBg = badgeGrey,
-                onClick = { onOpenContrato2("https://ofivirtual.cl/contrato-ejemplo-1.pdf") }
+                onClick = { onOpenContrato2("https://drive.google.com/file/d/1DpVk6lXWrnLHAPf8tBAEHQMkWsZqhnhJ/view?usp=sharing") }
             )
 
             Spacer(Modifier.height(24.dp))
@@ -244,7 +236,6 @@ fun HomeScreen(
     }
 }
 
-// --- INICIO DE SUB-COMPONENTES (VERSIÓN ÚNICA Y CORRECTA) ---
 
 @Composable
 private fun StatusChip(label: String, bg: Color, fg: Color) {
@@ -323,7 +314,7 @@ private fun ContractItem(
     onClick: () -> Unit
 ) {
     Card(
-        onClick = onClick, // ¡Aquí está la magia! Toda la tarjeta es ahora un botón.
+        onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)

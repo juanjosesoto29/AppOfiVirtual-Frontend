@@ -31,7 +31,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.material3.HorizontalDivider
 
-// --- Modelos de datos para esta pantalla ---
 private data class PlanOption(val nombre: String, val precio: Int, val precioOriginal: Int? = null)
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -43,7 +42,6 @@ fun PlanFullScreen(
     val context = LocalContext.current
     val OfiBlue = Color(0xFF071290)
 
-    // --- Definición de los servicios y opciones ---
     val serviciosFormalizacionDisponibles = remember {
         listOf(
             PlanOption("Creación de Empresa", 60_000),
@@ -61,20 +59,19 @@ fun PlanFullScreen(
         )
     }
 
-    // --- ESTADO DE LA SELECCIÓN ---
     var oficinaSeleccionada by remember { mutableStateOf(opcionesOficinaVirtual.first()) }
     var serviciosFormalizacionSeleccionados by remember { mutableStateOf(setOf<PlanOption>()) }
 
-    // --- LÓGICA DE NEGOCIO ---
+
     val patenteSePuedeSeleccionar = oficinaSeleccionada.precio > 0
     LaunchedEffect(patenteSePuedeSeleccionar) {
         if (!patenteSePuedeSeleccionar) {
-            // Si el usuario deselecciona la OV, quitamos la patente automáticamente.
+
             serviciosFormalizacionSeleccionados = serviciosFormalizacionSeleccionados.filter { it.nombre != "Gestión de Patente" }.toSet()
         }
     }
 
-    // --- CÁLCULOS DE PRECIOS DINÁMICOS ---
+
     val subtotalFormalizacion = serviciosFormalizacionSeleccionados.sumOf { it.precio }
     val totalSinDescuento = subtotalFormalizacion + oficinaSeleccionada.precio
     val descuentoPorcentaje = if (oficinaSeleccionada.precio > 0 && serviciosFormalizacionSeleccionados.isNotEmpty()) 0.15f else 0f
@@ -169,7 +166,7 @@ fun PlanFullScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
-            // --- Sección de selección de Oficina Virtual ---
+
             Text("1. Elige tu plan de Oficina Virtual", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
             Spacer(Modifier.height(12.dp))
             Column(Modifier.selectableGroup()) {
@@ -183,7 +180,7 @@ fun PlanFullScreen(
                 }
             }
 
-            // --- Sección de servicios de Formalización con Checkboxes ---
+
             Spacer(Modifier.height(16.dp))
             Text("2. Elige tus servicios de Formalización", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
             Spacer(Modifier.height(12.dp))
@@ -213,7 +210,7 @@ fun PlanFullScreen(
                         ) {
                             Checkbox(
                                 checked = isChecked,
-                                onCheckedChange = null, // La lógica está en el `clickable` del Row
+                                onCheckedChange = null,
                                 enabled = isEnabled
                             )
                             Spacer(Modifier.width(16.dp))
@@ -230,7 +227,7 @@ fun PlanFullScreen(
                                     )
                                 }
                             }
-                            // Precios
+
                             Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                                 if (servicio.precioOriginal != null) {
                                     Text(
@@ -266,9 +263,7 @@ fun PlanFullScreen(
             }
 
 
-            // PEGA ESTA NUEVA TARJETA DE RESUMEN MEJORADA
 
-            /* --- 3. Resumen y Descuento Aplicado --- */
             Spacer(Modifier.height(24.dp))
             Text("3. Resumen de tu Plan", style = MaterialTheme.typography.titleLarge.copy(fontWeight = FontWeight.SemiBold))
             Spacer(Modifier.height(12.dp))
@@ -281,31 +276,28 @@ fun PlanFullScreen(
                 Column(
                     modifier = Modifier
                         .padding(16.dp)
-                        .animateContentSize() // Anima los cambios de tamaño
+                        .animateContentSize()
                 ) {
-                    // 🔹 1. LISTADO DINÁMICO DE SERVICIOS SELECCIONADOS 🔹
-                    // Itera sobre la Oficina Virtual si fue seleccionada
+
                     if (oficinaSeleccionada.precio > 0) {
                         SummaryItemRow(label = oficinaSeleccionada.nombre, value = oficinaSeleccionada.precio.toCLP())
                     }
-                    // Itera sobre los servicios de formalización seleccionados
+
                     serviciosFormalizacionSeleccionados.forEach { servicio ->
                         SummaryItemRow(label = servicio.nombre, value = servicio.precio.toCLP())
                     }
 
-                    // --- Separador y totales (solo si hay items) ---
-                    if (puedeAgregarAlCarrito) { // puedeAgregarAlCarrito es 'precioFinal > 0'
+
+                    if (puedeAgregarAlCarrito) {
                         Spacer(Modifier.height(12.dp))
                         HorizontalDivider()
                         Spacer(Modifier.height(12.dp))
 
-                        // Muestra el total sin descuento SOLO si hay un descuento aplicado
                         if (montoDescuento > 0) {
                             InfoRow("Total sin descuento:", totalSinDescuento.toCLP(), isSubtle = true)
                             InfoRow("Descuento Especial (15%):", "-${montoDescuento.toCLP()}", color = Color(0xFF1E88E5))
                         }
                     } else {
-                        // Mensaje cuando no hay nada seleccionado
                         Text(
                             "Selecciona un servicio para ver el resumen.",
                             style = MaterialTheme.typography.bodyMedium,
@@ -320,8 +312,6 @@ fun PlanFullScreen(
     }
 }
 
-
-// --- COMPONENTES REUTILIZABLES ---
 
 @Composable
 private fun OpcionPlanCard(opcion: PlanOption, seleccionado: Boolean, onSelect: () -> Unit) {
@@ -355,12 +345,7 @@ private fun OpcionPlanCard(opcion: PlanOption, seleccionado: Boolean, onSelect: 
     }
 }
 
-// PEGA ESTE NUEVO COMPONENTE AL FINAL DEL ARCHIVO
 
-/**
- * Un Composable para mostrar cada ítem en la lista de resumen.
- * Usa un punto (•) para darle aspecto de lista.
- */
 @Composable
 private fun SummaryItemRow(label: String, value: String) {
     Row(
@@ -380,8 +365,6 @@ private fun SummaryItemRow(label: String, value: String) {
     }
 }
 
-// 🔹 OPCIONAL PERO RECOMENDADO: MODIFICAR InfoRow para darle más estilo 🔹
-// Reemplaza tu InfoRow actual con este para poder tener texto sutil.
 @Composable
 private fun InfoRow(label: String, value: String, color: Color = Color.Unspecified, isSubtle: Boolean = false) {
     val textStyle = if (isSubtle) MaterialTheme.typography.bodyMedium else MaterialTheme.typography.bodyLarge
@@ -409,9 +392,6 @@ private fun InfoRow(label: String, value: String, color: Color = Color.Unspecifi
     }
 }
 
-
-
-// Función helper para formatear CLP
 private fun Int.toCLP(): String {
     return "%,d".format(this).replace(",", ".") + " CLP"
 }

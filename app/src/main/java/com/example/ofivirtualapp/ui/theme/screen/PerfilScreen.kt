@@ -1,6 +1,5 @@
 package com.example.ofivirtualapp.ui.theme.screen
 
-// --- IMPORTS NECESARIOS ---
 import android.Manifest
 import android.content.Context
 import android.net.Uri
@@ -36,16 +35,13 @@ import java.text.SimpleDateFormat
 import java.util.*
 import com.example.ofivirtualapp.viewmodel.PerfilViewModel
 
-/* ================== PANTALLA PRINCIPAL ================== */
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PerfilScreen(
     perfilViewModel: PerfilViewModel,
-    uiState: PerfilUiState, // Recibimos el estado completo del ViewModel
+    uiState: PerfilUiState,
     onAvatarChange: (Uri?) -> Unit,
-    onEditarPerfil: () -> Unit = {},
-    onVerMisDatos: () -> Unit = {},
     onVerContratos: () -> Unit = {},
     onMetodosPago: () -> Unit = {},
     onNotificaciones: () -> Unit = {},
@@ -61,15 +57,11 @@ fun PerfilScreen(
     val BadgeGreen = Color(0xFF34C759)
     val context = LocalContext.current
 
-    // --- ESTADO Y LANZADORES PARA SELECCIÓN DE IMAGEN ---
 
-    // 1. Estado para mostrar el menú de selección (BottomSheet)
     var showSheet by remember { mutableStateOf(false) }
 
-    // 2. URI temporal para la foto tomada con la cámara
     var tempCameraUri by remember { mutableStateOf<Uri?>(null) }
 
-    // 3. Lanzador para obtener una imagen de la galería
     val galleryLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri ->
@@ -80,7 +72,6 @@ fun PerfilScreen(
         }
     )
 
-    // 4. Lanzador para tomar una foto con la cámara
     val cameraLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.TakePicture(),
         onResult = { success ->
@@ -91,24 +82,18 @@ fun PerfilScreen(
         }
     )
 
-    // 5. Lanzadores para los permisos de Cámara y Galería
     val cameraPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
             if (isGranted) {
-                // 1. CREAMOS UNA COPIA LOCAL DE LA URI.
-                // Esto le asegura al compilador que la variable no cambiará.
                 val localUri = tempCameraUri
                 if (localUri != null) {
-                    // 2. USAMOS LA COPIA LOCAL SEGURA.
                     cameraLauncher.launch(localUri)
                 }
             }
         }
     )
 
-    // La gestión del permiso de galería es automática en versiones recientes de Android
-    // al usar GetContent, pero lo dejamos explícito por buenas prácticas.
     val galleryPermissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
         onResult = { isGranted ->
@@ -118,8 +103,6 @@ fun PerfilScreen(
         }
     )
 
-    // --- UI ---
-
     if (showSheet) {
         ModalBottomSheet(onDismissRequest = { showSheet = false }) {
             Column(modifier = Modifier.padding(bottom = 32.dp)) {
@@ -127,11 +110,8 @@ fun PerfilScreen(
                     icon = Icons.Outlined.PhotoCamera,
                     text = "Tomar foto",
                     onClick = {
-                        // 1. PRIMERO, creamos una URI para guardar la foto.
                         val uri = context.createImageUri()
                         tempCameraUri = uri
-                        // 2. LUEGO, solicitamos el permiso para la cámara.
-                        // El lanzador de permisos se encargará de llamar a la cámara.
                         cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
                     }
                 )
@@ -139,7 +119,6 @@ fun PerfilScreen(
                     icon = Icons.Outlined.PhotoLibrary,
                     text = "Elegir de la galería",
                     onClick = {
-                        // En Android 13+ el permiso es más granular. Por simplicidad, GetContent es suficiente.
                         galleryLauncher.launch("image/*")
                     }
                 )
@@ -164,7 +143,6 @@ fun PerfilScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            /* --- Header: Avatar + datos --- */
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -177,25 +155,23 @@ fun PerfilScreen(
                         .padding(16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // --- AVATAR INTERACTIVO ---
                     Box(
                         modifier = Modifier
                             .size(56.dp)
                             .clip(CircleShape)
                             .background(OfiBlue)
-                            .clickable { showSheet = true }, // ¡HACE EL AVATAR CLICABLE!
+                            .clickable { showSheet = true },
                         contentAlignment = Alignment.Center
                     ) {
                         if (uiState.avatarUri != null) {
-                            // Si hay un URI, lo cargamos con Coil
+
                             AsyncImage(
                                 model = uiState.avatarUri,
                                 contentDescription = "Avatar de perfil",
                                 modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop // Asegura que la imagen llene el círculo
+                                contentScale = ContentScale.Crop
                             )
                         } else {
-                            // Si no, mostramos las iniciales
                             val initials = remember(uiState.user.nombre) { uiState.user.nombre.toInitials() }
                             Text(
                                 text = initials,
@@ -218,11 +194,7 @@ fun PerfilScreen(
                 }
             }
 
-            // ... El resto del código de la pantalla no necesita cambios ...
-            // (Plan actual, Opciones, Cerrar sesión, etc.)
-
             Spacer(Modifier.height(16.dp))
-            /* --- Plan actual --- */
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(16.dp),
@@ -253,7 +225,6 @@ fun PerfilScreen(
             }
             Spacer(Modifier.height(16.dp))
 
-            /* --- Opciones --- */
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 PerfilItem( icon = Icons.Outlined.Description, title = "Contratos", subtitle = "Documentos y estados", onClick = onVerContratos)
                 PerfilItem( icon = Icons.Outlined.CreditCard, title = "Métodos de pago", subtitle = "Tarjetas y medios guardados", onClick = onMetodosPago)
@@ -262,7 +233,6 @@ fun PerfilScreen(
             }
             Spacer(Modifier.height(16.dp))
 
-            /* --- Cerrar sesión (zona de peligro) --- */
             OutlinedButton(
                 onClick = onCerrarSesion,
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.error),
@@ -285,10 +255,6 @@ fun PerfilScreen(
     }
 }
 
-
-/* ================== SUBCOMPONENTES Y UTILS ================== */
-
-// Un Composable simple para los ítems del BottomSheet
 @Composable
 private fun ListTile(icon: androidx.compose.ui.graphics.vector.ImageVector, text: String, onClick: () -> Unit) {
     Row(
@@ -304,7 +270,6 @@ private fun ListTile(icon: androidx.compose.ui.graphics.vector.ImageVector, text
     }
 }
 
-// Función para crear un URI para la cámara
 private fun Context.createImageUri(): Uri {
     val timeStamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
     val imageFile = File(filesDir, "JPEG_${timeStamp}_.jpg")
@@ -315,8 +280,6 @@ private fun Context.createImageUri(): Uri {
     )
 }
 
-
-// --- Componentes que ya tenías (sin cambios) ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun PerfilItem(icon: androidx.compose.ui.graphics.vector.ImageVector, title: String, subtitle: String, onClick: () -> Unit) {

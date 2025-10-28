@@ -32,13 +32,11 @@ fun ServiciosScreen(
 ) {
     val OfiBlue = Color(0xFF071290)
 
-    // --- ESTADO PARA EL DIÁLOGO DE CONTABILIDAD LABORAL ---
     var showDialogContabilidad by remember { mutableStateOf(false) }
     var servicioParaDialogo by remember { mutableStateOf<ServicioUI?>(null) }
 
     val servicios = remember {
         listOf(
-            // ... Oficina Virtual y Formalización sin cambios ...
             ServicioUI(
                 categoria = CategoriaServicio.OFICINA_VIRTUAL,
                 nombre = "Plan Semestral",
@@ -87,14 +85,14 @@ fun ServiciosScreen(
                 descripcion = "Paquete configurable que incluye todos los servicios de formalización más un plan de oficina virtual a elección, con un descuento especial.",
                 precioCLP = -1 // Precio dinámico
             ),
-            // ... Contabilidad ...
+
             ServicioUI(
                 categoria = CategoriaServicio.CONTABILIDAD,
                 nombre = "Contabilidad Mensual",
                 descripcion = "Registro, declaraciones y cumplimiento mensual.",
                 precioCLP = 40_000
             ),
-            // --- CAMBIO EN CONTABILIDAD LABORAL ---
+
             ServicioUI(
                 categoria = CategoriaServicio.CONTABILIDAD,
                 nombre = "Contabilidad Laboral",
@@ -123,7 +121,6 @@ fun ServiciosScreen(
         )
     }
 
-    // --- DIÁLOGO ---
     if (showDialogContabilidad && servicioParaDialogo != null) {
         ContabilidadLaboralDialog(
             servicioBase = servicioParaDialogo!!,
@@ -162,7 +159,7 @@ fun ServiciosScreen(
         ordenCategorias.forEachIndexed { i, categoria ->
             val lista = agrupado[categoria].orEmpty()
             if (lista.isNotEmpty()) {
-                // REEMPLAZA EL TEXT ANTERIOR CON ESTE BLOQUE 'WHEN'
+
                 Text(
                     text = when (categoria) {
                         CategoriaServicio.OFICINA_VIRTUAL -> "Oficina Virtual"
@@ -173,7 +170,7 @@ fun ServiciosScreen(
                 )
                 Spacer(Modifier.height(10.dp))
                 lista.forEachIndexed { idx, s ->
-                    // --- LÓGICA CONDICIONAL PARA SERVICIOS ESPECIALES ---
+
                     when {
                         // Caso 1: Plan Full
                         s.nombre == "Plan Full" -> {
@@ -272,7 +269,6 @@ private fun ServicioCard(
     }
 }
 
-/* ----------------- DIÁLOGO ESPECÍFICO ----------------- */
 @Composable
 private fun ContabilidadLaboralDialog(
     servicioBase: ServicioUI,
@@ -289,7 +285,7 @@ private fun ContabilidadLaboralDialog(
             Column {
                 Text("Selecciona el número de trabajadores para calcular el precio final.")
                 Spacer(Modifier.height(16.dp))
-                // --- Selector de cantidad ---
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,
@@ -308,7 +304,7 @@ private fun ContabilidadLaboralDialog(
                     }
                 }
                 Spacer(Modifier.height(16.dp))
-                // --- Precio final ---
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -321,11 +317,11 @@ private fun ContabilidadLaboralDialog(
         },
         confirmButton = {
             Button(onClick = {
-                // Creamos una nueva instancia del servicio con el precio y nombre actualizados
+
                 val servicioFinal = servicioBase.copy(
                     nombre = "${servicioBase.nombre} (x$cantidadPersonas)",
                     precioCLP = precioTotal,
-                    esPorPersona = false // Lo marcamos como falso para que no vuelva a abrir el diálogo en el carrito
+                    esPorPersona = false
                 )
                 onConfirm(servicioFinal)
             }) {
@@ -340,8 +336,6 @@ private fun ContabilidadLaboralDialog(
     )
 }
 
-
-/* ----------------- Utils ----------------- */
 
 private fun Int.toCLP(): String {
     if (this == 0) return "$0"

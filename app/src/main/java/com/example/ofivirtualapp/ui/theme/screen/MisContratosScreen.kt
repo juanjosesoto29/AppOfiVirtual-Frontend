@@ -18,24 +18,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// --- 1. Modelo de datos para esta pantalla ---
+
 data class ContratoInfo(
     val tipo: String,
     val nombre: String,
     val fechaEmision: String,
     val estaVigente: Boolean,
-    val url: String // Link para abrir el contrato
+    val url: String
 )
 
-// --- 2. El Composable principal de la pantalla ---
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MisContratosScreen(
     onNavigateBack: () -> Unit,
-    onOpenContrato: (String) -> Unit // Función para abrir el link
+    onOpenContrato: (String) -> Unit
 ) {
-    // Lista de ejemplo de los contratos del usuario.
-    // En un futuro, estos datos vendrían del ViewModel.
+
     val listaDeContratos = listOf(
         ContratoInfo(
             tipo = "O",
@@ -45,11 +44,11 @@ fun MisContratosScreen(
             url = "https://drive.google.com/file/d/1U2JMb9S1laCQOtB8c9JCX0pNOb5TrzFl/view?usp=sharing"
         ),
         ContratoInfo(
-            tipo = "C",
-            nombre = "Contrato Contabilidad",
+            tipo = "O",
+            nombre = "Contrato Oficina Virtual",
             fechaEmision = "Emitido 05/03/2025",
             estaVigente = false,
-            url = "https://ofivirtual.cl/contrato-ejemplo-1.pdf"
+            url = "https://drive.google.com/file/d/1DpVk6lXWrnLHAPf8tBAEHQMkWsZqhnhJ/view?usp=sharing"
         )
     )
 
@@ -65,7 +64,6 @@ fun MisContratosScreen(
             )
         }
     ) { innerPadding ->
-        // Usamos LazyColumn para un rendimiento óptimo si la lista crece.
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -83,7 +81,6 @@ fun MisContratosScreen(
     }
 }
 
-// --- 3. El Composable para cada tarjeta de contrato ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ContratoCard(
@@ -94,7 +91,7 @@ private fun ContratoCard(
     val badgeGrey = Color(0xFF9AA3AF)
 
     Card(
-        onClick = onClick, // La tarjeta es clicable
+        onClick = onClick,
         shape = RoundedCornerShape(12.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
@@ -105,7 +102,6 @@ private fun ContratoCard(
                 .padding(horizontal = 16.dp, vertical = 12.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Icono con la inicial (O, C, F...)
             Box(
                 modifier = Modifier
                     .size(40.dp)
@@ -121,7 +117,7 @@ private fun ContratoCard(
             }
             Spacer(Modifier.width(16.dp))
 
-            // Nombre y fecha
+
             Column(Modifier.weight(1f)) {
                 Text(
                     contrato.nombre,
@@ -136,7 +132,6 @@ private fun ContratoCard(
             }
             Spacer(Modifier.width(8.dp))
 
-            // Chip de estado (VIGENTE / VENCIDO)
             StatusChip(
                 label = if (contrato.estaVigente) "VIGENTE" else "VENCIDO",
                 bg = if (contrato.estaVigente) badgeGreen else badgeGrey,
@@ -146,7 +141,6 @@ private fun ContratoCard(
     }
 }
 
-// Re-utilizamos el Composable StatusChip que ya tienes en otras pantallas
 @Composable
 private fun StatusChip(label: String, bg: Color, fg: Color) {
     Box(

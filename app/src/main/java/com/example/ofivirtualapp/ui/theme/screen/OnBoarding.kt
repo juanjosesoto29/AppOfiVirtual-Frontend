@@ -32,7 +32,6 @@ fun OnboardingScreen(
 ) {
     val OfiBlue = Color(0xFF071290)
 
-    // Dispara animaciones al entrar
     var start by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { start = true }
 
@@ -57,7 +56,7 @@ fun OnboardingScreen(
                     painter = painterResource(id = R.drawable.ofivirtual_logo),
                     contentDescription = "Logo OfiVirtual",
                     modifier = Modifier
-                        .size(200.dp) // <-- Tamaño actual
+                        .size(200.dp)
                         .padding(bottom = 10.dp),
                     contentScale = ContentScale.Fit
                 )
@@ -96,7 +95,7 @@ fun OnboardingScreen(
 
             Spacer(Modifier.height(40.dp))
 
-            // BOTÓN PRINCIPAL (Comenzar) con gradiente y elevación
+
             AnimatedVisibility(
                 visible = start,
                 enter = fadeIn(animationSpec = tween(500, delayMillis = 320)) +
@@ -114,7 +113,7 @@ fun OnboardingScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Button(
-                        onClick = onRegister, // <- navega a Register
+                        onClick = onRegister,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color.Transparent,
                             contentColor = OfiBlue
@@ -129,7 +128,6 @@ fun OnboardingScreen(
 
             Spacer(Modifier.height(12.dp))
 
-            // BOTÓN SECUNDARIO (Ya tengo cuenta)
             AnimatedVisibility(
                 visible = start,
                 enter = fadeIn(animationSpec = tween(500, delayMillis = 420)) +
@@ -149,7 +147,6 @@ fun OnboardingScreen(
 
             Spacer(Modifier.height(8.dp))
 
-            // LINK Invitado
             AnimatedVisibility(
                 visible = start,
                 enter = fadeIn(animationSpec = tween(500, delayMillis = 480)) +

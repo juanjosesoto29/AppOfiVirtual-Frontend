@@ -21,7 +21,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-// ================== MODELO DE DATOS ==================
+
 private data class Notificacion(
     val id: Int,
     val titulo: String,
@@ -32,19 +32,18 @@ private data class Notificacion(
 )
 
 private enum class TipoNotificacion(val icon: ImageVector, val color: Color) {
-    CONTRATO(Icons.Outlined.Description, Color(0xFF4CAF50)),       // Verde
-    PAGO(Icons.Outlined.CreditCard, Color(0xFF2196F3)),          // Azul
-    SOPORTE(Icons.Outlined.SupportAgent, Color(0xFFFF9800)),     // Naranja
-    GENERAL(Icons.Outlined.Campaign, Color(0xFF673AB7))          // Morado
+    CONTRATO(Icons.Outlined.Description, Color(0xFF4CAF50)),
+    PAGO(Icons.Outlined.CreditCard, Color(0xFF2196F3)),
+    SOPORTE(Icons.Outlined.SupportAgent, Color(0xFFFF9800)),
+    GENERAL(Icons.Outlined.Campaign, Color(0xFF673AB7))
 }
 
-// ================== PUBLIC API ==================
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificacionesScreen(
     onNavigateBack: () -> Unit
 ) {
-    // Lista de notificaciones de ejemplo
     var notificaciones by remember {
         mutableStateOf(
             listOf(
@@ -67,7 +66,6 @@ fun NotificacionesScreen(
                     }
                 },
                 actions = {
-                    // Botón para marcar todas como leídas
                     IconButton(onClick = {
                         notificaciones = notificaciones.map { it.copy(leida = true) }
                     }) {
@@ -93,7 +91,6 @@ fun NotificacionesScreen(
                     NotificacionItem(
                         notificacion = notificacion,
                         onClick = {
-                            // Marcar como leída/no leída al hacer clic
                             notificaciones = notificaciones.map {
                                 if (it.id == notificacion.id) it.copy(leida = !it.leida) else it
                             }
@@ -107,7 +104,6 @@ fun NotificacionesScreen(
 }
 
 
-// ================== UI COMPONENT ==================
 @Composable
 private fun NotificacionItem(
     notificacion: Notificacion,

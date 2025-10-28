@@ -6,7 +6,12 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
 
-    <!-- 2. DECLARA QUE LA APP USA LA CÁMARA, PERO NO ES OBLIGATORIA -->
+    <!-- ESTO QUITA EL WARNING, PERO NO ES LA MEJOR SOLUCIÓN -->
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />

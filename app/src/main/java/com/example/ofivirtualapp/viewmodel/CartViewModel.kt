@@ -8,7 +8,7 @@ import com.example.ofivirtualapp.ui.theme.screen.ServicioUI // 🔹 1. IMPORTAMO
 
 // Estado de la UI para el carrito. Ahora contiene una lista de ServicioUI.
 data class CartUiState(
-    val items: List<ServicioUI> = emptyList() // 🔹 2. USAMOS List<ServicioUI> 🔹
+    val items: List<ServicioUI> = emptyList() //  2. USAMOS List<ServicioUI>
 )
 
 class CartViewModel : ViewModel() {
@@ -19,13 +19,13 @@ class CartViewModel : ViewModel() {
 
     // Estado derivado para calcular el subtotal automáticamente
     val subtotal: State<Int> = derivedStateOf {
-        _uiState.value.items.sumOf { it.precioCLP } // 🔹 3. SUMAMOS LOS PRECIOS DE ServicioUI 🔹
+        _uiState.value.items.sumOf { it.precioCLP } //  3. SUMAMOS LOS PRECIOS DE ServicioUI
     }
 
     /**
      * Agrega un nuevo servicio al carrito.
      */
-    fun addItem(servicio: ServicioUI) { // 🔹 4. LA FUNCIÓN AHORA RECIBE un ServicioUI 🔹
+    fun addItem(servicio: ServicioUI) { //  4. LA FUNCIÓN AHORA RECIBE un ServicioUI
         _uiState.value = _uiState.value.copy(
             items = _uiState.value.items + servicio
         )
@@ -34,7 +34,7 @@ class CartViewModel : ViewModel() {
     /**
      * Elimina un servicio del carrito por su ID.
      */
-    fun removeItem(servicio: ServicioUI) { // 🔹 5. LA FUNCIÓN ELIMINA un ServicioUI 🔹
+    fun removeItem(servicio: ServicioUI) { //  5. LA FUNCIÓN ELIMINA un ServicioUI
         _uiState.value = _uiState.value.copy(
             items = _uiState.value.items.filterNot { it.id == servicio.id }
         )

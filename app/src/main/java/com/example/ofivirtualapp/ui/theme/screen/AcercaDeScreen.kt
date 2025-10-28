@@ -32,10 +32,9 @@ fun AcercaDeScreen(
     onNavigateBack: () -> Unit,
     appName: String = "OfiVirtual",
     description: String = "Ofivirtual es una empresa especializada en la creación de empresas, contabilidad y oficinas virtuales. Nuestra misión es apoyar a los emprendedores y pymes en su crecimiento.",
-    // Información de OfiVirtual
     websiteUrl: String = "https://ofivirtual.cl",
     email: String = "contacto@ofivirtual.cl",
-    whatsapp: String = "+56912345678",
+    whatsapp: String = "+56928532988",
     privacyUrl: String = "https://ofivirtual.cl/politica-privacidad/",
     contacUrl: String = "https://ofivirtual.cl/contacto/",
     instagramUrl: String = "https://instagram.com/ofivirtual",
@@ -115,7 +114,6 @@ fun AcercaDeScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // --- SECCIÓN DESTACADA (Y ÚNICA) PARA EL SITIO WEB ---
             SectionCard(title = "Sitio Web Principal") {
                 LinkItem(
                     icon = Icons.Outlined.Language,
@@ -127,7 +125,6 @@ fun AcercaDeScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // --- SECCIÓN "ENLACES" (AHORA SIN EL SITIO WEB REPETIDO) ---
             SectionCard(title = "Información y Soporte") {
                 LinkItem(
                     icon = Icons.Outlined.PrivacyTip,
@@ -136,7 +133,7 @@ fun AcercaDeScreen(
                     onClick = { openUrl(context, privacyUrl) }
                 )
                 LinkItem(
-                    icon = Icons.Outlined.HeadsetMic, // Ícono más claro para contacto/soporte
+                    icon = Icons.Outlined.HeadsetMic,
                     title = "Contáctanos",
                     subtitle = "Resuelve tus dudas con nosotros",
                     onClick = { openUrl(context, contacUrl) }
@@ -145,7 +142,6 @@ fun AcercaDeScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Card de Contacto directo
             SectionCard(title = "Contacto Directo") {
                 LinkItem(
                     icon = Icons.Outlined.AlternateEmail,
@@ -163,7 +159,6 @@ fun AcercaDeScreen(
 
             Spacer(Modifier.height(16.dp))
 
-            // Card de Redes Sociales
             SectionCard(title = "Síguenos en Redes") {
                 LinkItem(
                     icon = painterResource(id = R.drawable.ic_instagram),
@@ -185,7 +180,6 @@ fun AcercaDeScreen(
                 )
             }
 
-            // Pie de página con Copyright
             Spacer(Modifier.weight(1f))
             Text(
                 "© ${java.util.Calendar.getInstance().get(java.util.Calendar.YEAR)} OfiVirtual. Todos los derechos reservados.",
@@ -218,7 +212,6 @@ private fun SectionCard(
     }
 }
 
-// Versión para ImageVector
 @Composable
 private fun LinkItem(
     icon: androidx.compose.ui.graphics.vector.ImageVector,
@@ -242,7 +235,6 @@ private fun LinkItem(
     }
 }
 
-// Versión para Painter
 @Composable
 private fun LinkItem(
     icon: androidx.compose.ui.graphics.painter.Painter,
@@ -271,7 +263,6 @@ private fun LinkItem(
     }
 }
 
-// Funciones helpers
 private fun openUrl(context: android.content.Context, url: String) {
     runCatching {
         val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))

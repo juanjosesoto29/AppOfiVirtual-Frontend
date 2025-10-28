@@ -18,7 +18,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
 
-// Pantalla conectada al ViewModel (sin cambios)
+
 @Composable
 fun RegisterScreenVm(
     vm: AuthViewModel,
@@ -56,7 +56,6 @@ fun RegisterScreenVm(
     )
 }
 
-// Pantalla de UI (aquí hacemos los cambios)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun RegisterScreen(
@@ -84,7 +83,7 @@ private fun RegisterScreen(
     var showPass by remember { mutableStateOf(false) }
     var showConfirm by remember { mutableStateOf(false) }
 
-    // De nuevo, usamos Scaffold para que aplique el tema.
+
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -93,7 +92,7 @@ private fun RegisterScreen(
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            // Hacemos la columna deslizable para que quepa en pantallas pequeñas
+
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -105,7 +104,7 @@ private fun RegisterScreen(
                 )
                 Spacer(Modifier.height(12.dp))
 
-                // --- FORMULARIO (sin cambios) ---
+                // --- FORMULARIO
                 OutlinedTextField(
                     value = name,
                     onValueChange = onNameChange,

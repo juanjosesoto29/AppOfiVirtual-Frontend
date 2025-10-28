@@ -1,18 +1,14 @@
 package com.example.ofivirtualapp.viewmodel
 
-import androidx.lifecycle.ViewModel                       // Base de ViewModel
-import androidx.lifecycle.viewModelScope                  // Scope de corrutinas ligado al VM
-import kotlinx.coroutines.delay                            // Simulamos tareas async (IO/red)
-import kotlinx.coroutines.flow.MutableStateFlow            // Estado observable mutable
-import kotlinx.coroutines.flow.StateFlow                   // Exposición inmutable
-import kotlinx.coroutines.flow.update                      // Helper para actualizar flows
-import kotlinx.coroutines.launch                            // Lanzar corrutinas
-import com.example.ofivirtualapp.domain.validation.*         // Importamos las funciones de validación
-
-// 1.- 🔁 NUEVO: importamos el repositorio real que habla con Room/SQLite
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import com.example.ofivirtualapp.domain.validation.*
 import com.example.ofivirtualapp.data.repository.UserRepository
-
-// ----------------- ESTADOS DE UI (observable con StateFlow) -----------------
 
 data class LoginUiState(                                   // Estado de la pantalla Login
     val email: String = "",                                // Campo email
@@ -44,12 +40,9 @@ data class RegisterUiState(                                // Estado de la panta
     val errorMsg: String? = null                           // Error global (ej: duplicado)
 )
 
-// ----------------- COLECCIÓN EN MEMORIA (solo para la demo) -----------------
-
-//2.- Eliminamos la estructura de DemoUser
 
 class AuthViewModel(
-    // ✅ NUEVO: 4.- inyectamos el repositorio real que usa Room/SQLite
+    //  4.- inyectamos el repositorio real que usa Room/SQLite
     private val repository: UserRepository
 ) : ViewModel() {                         // ViewModel que maneja Login/Registro
 
@@ -158,7 +151,7 @@ class AuthViewModel(
             _register.update { it.copy(isSubmitting = true, errorMsg = null, success = false) } // Loading
             delay(700)                                      // Simulamos IO
 
-            // 7.- Se cambia esto por lo anterior✅ NUEVO: inserta en BD (con teléfono) vía repositorio
+            // 7.- Se cambia esto por lo anterior NUEVO: inserta en BD (con teléfono) vía repositorio
             val result = repository.register(
                 name = s.name.trim(),
                 email = s.email.trim(),

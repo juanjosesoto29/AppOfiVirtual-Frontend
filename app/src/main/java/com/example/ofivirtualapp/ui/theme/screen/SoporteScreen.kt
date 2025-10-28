@@ -21,17 +21,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.ofivirtualapp.navigation.Route
 
-// ================== PUBLIC API ==================
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SoporteScreen(
     onNavigateBack: () -> Unit,
-    onGoToFaq: () -> Unit // Acción para navegar a la pantalla de FAQ
+    onGoToFaq: () -> Unit
 ) {
     val context = LocalContext.current
 
-    // Datos de contacto (centralizados aquí para fácil modificación)
-    val whatsappNumber = "+56912345678"
+    val whatsappNumber = "+56928532988"
     val supportEmail = "soporte@ofivirtual.cl"
 
     Scaffold(
@@ -60,7 +58,6 @@ fun SoporteScreen(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            // Card para auto-ayuda (FAQ)
             SupportSection(title = "Auto-ayuda") {
                 SupportItem(
                     icon = Icons.Outlined.Quiz,
@@ -70,7 +67,6 @@ fun SoporteScreen(
                 )
             }
 
-            // Card para contacto directo
             SupportSection(title = "Contacto Directo") {
                 SupportItem(
                     icon = Icons.Outlined.Call,
@@ -91,7 +87,6 @@ fun SoporteScreen(
 }
 
 
-// ================== UI COMPONENTS ==================
 @Composable
 private fun SupportSection(
     title: String,
@@ -139,7 +134,6 @@ private fun SupportItem(
 }
 
 
-// ================== FUNCIONES HELPER (reutilizadas de AcercaDeScreen) ==================
 private fun openUrl(context: android.content.Context, url: String) {
     runCatching {
         context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))

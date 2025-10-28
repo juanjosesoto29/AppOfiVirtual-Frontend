@@ -19,7 +19,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ofivirtualapp.data.local.storage.UserPreferences
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
 
-// Pantalla conectada al ViewModel (sin cambios)
+
 @Composable
 fun LoginScreenVm(
     vm: AuthViewModel,
@@ -31,7 +31,6 @@ fun LoginScreenVm(
 
     LaunchedEffect(state.success) {
         if (state.success) {
-            // Ahora 'userPrefs' es el que se recibe por parámetro (la instancia correcta)
             userPrefs.saveUserEmail(state.email)
             userPrefs.setLoggedIn(true)
             vm.clearLoginResult()
@@ -54,8 +53,7 @@ fun LoginScreenVm(
     )
 }
 
-// Pantalla de UI (aquí hacemos los cambios)
-@OptIn(ExperimentalMaterial3Api::class) // Necesario para Scaffold
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun LoginScreen(
     email: String,
@@ -77,7 +75,6 @@ private fun LoginScreen(
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                // Aplicamos el padding que nos da el Scaffold y el nuestro
                 .padding(innerPadding)
                 .padding(16.dp),
             contentAlignment = Alignment.Center
@@ -92,7 +89,7 @@ private fun LoginScreen(
                 )
                 Spacer(Modifier.height(20.dp))
 
-                // --- FORMULARIO (sin cambios) ---
+                // --- FORMULARIO
                 OutlinedTextField(
                     value = email,
                     onValueChange = onEmailChange,

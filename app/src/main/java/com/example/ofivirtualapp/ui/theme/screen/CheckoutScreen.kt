@@ -7,7 +7,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-// --- CAMBIO AQUÍ: Importamos el ícono que vamos a usar ---
 import androidx.compose.material.icons.outlined.CheckCircle
 import androidx.compose.material.icons.outlined.CreditCard
 import androidx.compose.material.icons.outlined.ReceiptLong
@@ -25,19 +24,19 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.delay
 
-// ================== PUBLIC API ==================
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CheckoutScreen(
     totalAPagar: Int,
     onNavigateBack: () -> Unit,
-    onPaymentSuccess: () -> Unit, // Acción para cuando el pago es exitoso
-    onClearCart: () -> Unit // Acción para vaciar el carrito
+    onPaymentSuccess: () -> Unit,
+    onClearCart: () -> Unit
 ) {
     val OfiBlue = Color(0xFF071290)
     val context = LocalContext.current
 
-    // Estados para la simulación de pago
+
     var isPaying by remember { mutableStateOf(false) }
     var paymentSuccess by remember { mutableStateOf(false) }
 
@@ -46,7 +45,6 @@ fun CheckoutScreen(
             TopAppBar(
                 title = { Text("Resumen de Pago", fontWeight = FontWeight.SemiBold) },
                 navigationIcon = {
-                    // El botón de volver solo está activo si no se está pagando
                     if (!isPaying) {
                         IconButton(onClick = onNavigateBack) {
                             Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
@@ -56,7 +54,7 @@ fun CheckoutScreen(
             )
         },
         bottomBar = {
-            // Barra inferior con el botón de pago
+
             Surface(shadowElevation = 8.dp) {
                 Column(Modifier.padding(16.dp)) {
                     Button(
@@ -65,7 +63,7 @@ fun CheckoutScreen(
                                 isPaying = true
                             }
                         },
-                        enabled = !isPaying, // Deshabilitar si ya se está pagando
+                        enabled = !isPaying,
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(54.dp),
@@ -90,26 +88,22 @@ fun CheckoutScreen(
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Animación de pago
             if (isPaying) {
                 PaymentProcessing(
                     onSuccess = {
                         paymentSuccess = true
-                        onClearCart() // Vaciamos el carrito
-                        // Esta es solo una simulación de UX
+                        onClearCart()
+
                     },
-                    onNavigateHome = onPaymentSuccess // Navegamos a Home
+                    onNavigateHome = onPaymentSuccess
                 )
             } else {
-                // Contenido normal del checkout
                 CheckoutContent(total = totalAPagar)
             }
         }
     }
 }
 
-
-// ================== UI COMPONENTS ==================
 
 @Composable
 private fun CheckoutContent(total: Int) {
@@ -164,15 +158,15 @@ private fun PaymentProcessing(
     var message by remember { mutableStateOf("Procesando pago...") }
     var showSuccessIcon by remember { mutableStateOf(false) }
 
-    // Simula el proceso de pago con delays
+
     LaunchedEffect(Unit) {
-        delay(2500) // Simula la comunicación con la pasarela de pago
+        delay(2500)
         message = "¡Pago exitoso!"
         showSuccessIcon = true
-        onSuccess() // Llama a la acción para limpiar el carrito en el ViewModel
+        onSuccess()
         Toast.makeText(context, "¡Gracias por tu compra!", Toast.LENGTH_LONG).show()
-        delay(2000) // Espera para que el usuario vea el mensaje de éxito
-        onNavigateHome() // Navega a la pantalla de inicio
+        delay(2000)
+        onNavigateHome()
     }
 
     Column(
@@ -183,7 +177,6 @@ private fun PaymentProcessing(
         verticalArrangement = Arrangement.Center
     ) {
         if (showSuccessIcon) {
-            // --- CAMBIO AQUÍ: Usamos el ícono de Material en lugar de un drawable ---
             Icon(
                 imageVector = Icons.Outlined.CheckCircle,
                 contentDescription = "Pago Exitoso",
@@ -202,7 +195,6 @@ private fun PaymentProcessing(
     }
 }
 
-// Asegúrate de tener esta función de utilidad o una similar disponible
 private fun Int.toCLP(): String {
     if (this == 0) return "$0"
     val s = this.toString()

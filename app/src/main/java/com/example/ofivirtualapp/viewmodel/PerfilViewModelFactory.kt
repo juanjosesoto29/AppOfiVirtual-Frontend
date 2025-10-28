@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.ofivirtualapp.data.local.storage.UserPreferences
 import com.example.ofivirtualapp.data.repository.UserRepository
 
-// Factory para inyectar dependencias en PerfilViewModel
+
 @Suppress("UNCHECKED_CAST")
 class PerfilViewModelFactory(
     private val userRepository: UserRepository,

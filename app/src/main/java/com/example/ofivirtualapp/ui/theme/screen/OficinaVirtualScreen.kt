@@ -66,7 +66,6 @@ fun OficinaVirtualScreen(
     }
 }
 
-/* ----------------- Model & UI ----------------- */
 
 data class PlanOV(
     val nombre: String,
@@ -88,7 +87,6 @@ private fun PlanOVCard(
         modifier = Modifier.fillMaxWidth()
     ) {
         Column(Modifier.padding(16.dp)) {
-            // --- CAMBIO DE DISEÑO APLICADO AQUÍ ---
 
             // 1. Nombre del plan
             Text(
@@ -131,7 +129,6 @@ private fun PlanOVCard(
     }
 }
 
-/* ----------------- Utils ----------------- */
 
 private fun Int.toCLP(): String {
     if (this == 0) return "$0"

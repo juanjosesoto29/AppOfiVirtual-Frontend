@@ -12,7 +12,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-/* ============== PUBLIC API ============== */
+
 
 @Composable
 fun ContabilidadScreen(
@@ -20,7 +20,6 @@ fun ContabilidadScreen(
 ) {
     val OfiBlue = Color(0xFF071290)
 
-    // Catálogo base (puedes moverlo a tu VM/repositorio)
     val servicios = remember {
         listOf(
             // Mensual
@@ -91,7 +90,6 @@ fun ContabilidadScreen(
     }
 }
 
-/* ============== MODELO ============== */
 
 enum class CategoriaConta(val titulo: String) {
     MENSUAL("Mensual"),
@@ -107,8 +105,6 @@ data class ServicioConta(
     val precioCLP: Int
 )
 
-/* ============== UI (CON DISEÑO ACTUALIZADO) ============== */
-
 @Composable
 private fun ServicioContaCard(
     servicio: ServicioConta,
@@ -122,7 +118,6 @@ private fun ServicioContaCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(Modifier.padding(16.dp)) {
-            // --- CAMBIO DE DISEÑO APLICADO AQUÍ ---
 
             // 1. Nombre del servicio
             Text(
@@ -166,10 +161,9 @@ private fun ServicioContaCard(
     }
 }
 
-/* ============== UTILS ============== */
 
 private fun Int.toCLP(): String {
-    if (this == 0) return "$0" // Añadida validación para precio cero
+    if (this == 0) return "$0"
     val s = this.toString()
     val sb = StringBuilder()
     var c = 0

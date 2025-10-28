@@ -24,11 +24,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
-// ================== PUBLIC API ==================
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FaqScreen(
-    onNavigateBack: () -> Unit // <--- ERROR 1 CORREGIDO: Añadido para poder volver atrás
+    onNavigateBack: () -> Unit
 ) {
     val OfiBlue = Color(0xFF071290)
 
@@ -65,7 +65,6 @@ fun FaqScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Preguntas Frecuentes", fontWeight = FontWeight.SemiBold) },
-                // --- Botón de retroceso ---
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -77,7 +76,6 @@ fun FaqScreen(
             )
         }
     ) { inner ->
-        // Usamos LazyColumn para mejor rendimiento en listas
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -91,7 +89,7 @@ fun FaqScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(Modifier.height(6.dp)) // Reducido para que se vea más junto
+                Spacer(Modifier.height(6.dp))
             }
 
             items(faqs) { item ->
@@ -104,13 +102,11 @@ fun FaqScreen(
     }
 }
 
-// ================== Modelo ==================
 private data class FaqItem(
     val pregunta: String,
     val respuesta: String
 )
 
-// ================== UI Component ==================
 @Composable
 private fun FaqCard(
     faq: FaqItem,
@@ -118,12 +114,12 @@ private fun FaqCard(
 ) {
     var expanded by remember { mutableStateOf(false) }
 
-    Card( // Usamos Card normal para más flexibilidad
+    Card(
         shape = MaterialTheme.shapes.large,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f)),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { expanded = !expanded } // <--- ERROR 3 CORREGIDO: onClick se aplica aquí
+            .clickable { expanded = !expanded }
     ) {
         Column(
             modifier = Modifier
@@ -149,7 +145,6 @@ private fun FaqCard(
                 )
             }
 
-            // Animación para mostrar/ocultar la respuesta
             AnimatedVisibility(
                 visible = expanded,
                 enter = fadeIn(animationSpec = tween(150)) + expandVertically(animationSpec = tween(300)),

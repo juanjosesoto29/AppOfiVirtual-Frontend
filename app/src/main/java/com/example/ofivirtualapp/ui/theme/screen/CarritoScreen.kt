@@ -18,10 +18,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-
-
-/* ================== PANTALLA PRINCIPAL DEL CARRITO ================== */
-
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CarritoScreen(
@@ -34,12 +30,11 @@ fun CarritoScreen(
         topBar = {
             TopAppBar(
                 title = { Text("Mi Carrito", fontWeight = FontWeight.SemiBold) },
-                // Puedes agregar un botón de volver si es necesario
-                // navigationIcon = { IconButton(onClick = {}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } }
+                navigationIcon = { IconButton(onClick = {}) { Icon(Icons.AutoMirrored.Filled.ArrowBack, null) } }
             )
         },
         bottomBar = {
-            // ... (BottomBar se mantiene igual, lo omito por brevedad)
+
             Surface(shadowElevation = 8.dp) {
                 Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(16.dp)) {
                     Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
@@ -70,7 +65,6 @@ fun CarritoScreen(
                 contentPadding = PaddingValues(vertical = 16.dp)
             ) {
                 items(items, key = { it.id }) { item ->
-                    // La LazyColumn ahora usa nuestra tarjeta inteligente
                     CartItemCard(
                         item = item,
                         onRemoveClick = { onRemoveItem(item) }
@@ -81,9 +75,6 @@ fun CarritoScreen(
     }
 }
 
-/* ================== COMPONENTES DE LA PANTALLA ================== */
-
-// 🔹🔹🔹 INICIO DE LA CORRECCIÓN: LA TARJETA INTELIGENTE 🔹🔹🔹
 @Composable
 private fun CartItemCard(
     item: ServicioUI,
@@ -94,7 +85,6 @@ private fun CartItemCard(
         shape = RoundedCornerShape(16.dp),
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f))
     ) {
-        // Usamos una lógica condicional (when) para decidir cómo mostrar la tarjeta
         when (item.nombre) {
             "PLAN_PERSONALIZADO" -> PlanPersonalizadoCardContent(item, onRemoveClick)
             else -> ServicioSimpleCardContent(item, onRemoveClick)
@@ -102,7 +92,6 @@ private fun CartItemCard(
     }
 }
 
-// --- Vista para servicios normales (lo que ya tenías) ---
 @Composable
 private fun ServicioSimpleCardContent(item: ServicioUI, onRemoveClick: () -> Unit) {
     Row(
@@ -131,14 +120,12 @@ private fun ServicioSimpleCardContent(item: ServicioUI, onRemoveClick: () -> Uni
     }
 }
 
-// --- Nueva vista detallada para el Plan Personalizado ---
+
 @Composable
 private fun PlanPersonalizadoCardContent(item: ServicioUI, onRemoveClick: () -> Unit) {
-    // "Desempaquetamos" la descripción detallada
     val detalles = item.descripcion.split("|")
 
     Column(modifier = Modifier.padding(16.dp)) {
-        // --- Cabecera ---
         Row(verticalAlignment = Alignment.Top) {
             Column(Modifier.weight(1f)) {
                 Text("Plan Personalizado", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
@@ -154,10 +141,10 @@ private fun PlanPersonalizadoCardContent(item: ServicioUI, onRemoveClick: () -> 
             }
         }
         Spacer(Modifier.height(12.dp))
-        Divider()
+        HorizontalDivider()
         Spacer(Modifier.height(12.dp))
 
-        // --- Lista detallada de servicios ---
+
         Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
             detalles.forEach { detalleString ->
                 // Separamos "Nombre del servicio: Precio"
@@ -175,7 +162,7 @@ private fun PlanPersonalizadoCardContent(item: ServicioUI, onRemoveClick: () -> 
             }
         }
         Spacer(Modifier.height(12.dp))
-        Divider()
+        HorizontalDivider()
         Spacer(Modifier.height(12.dp))
 
         // --- Total del Plan ---
@@ -189,8 +176,6 @@ private fun PlanPersonalizadoCardContent(item: ServicioUI, onRemoveClick: () -> 
         }
     }
 }
-// 🔹🔹🔹 FIN DE LA CORRECCIÓN 🔹🔹🔹
-
 
 @Composable
 private fun EmptyState() {
@@ -207,7 +192,6 @@ private fun EmptyState() {
     }
 }
 
-// Función helper (la movemos aquí para que sea local a las pantallas que la usan)
 private fun Int.toCLP(): String {
     return "%,d".format(this).replace(",", ".") + " CLP"
 }

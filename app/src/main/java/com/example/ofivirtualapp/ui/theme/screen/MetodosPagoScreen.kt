@@ -2,14 +2,15 @@ package com.example.ofivirtualapp.ui.theme.screen
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -18,14 +19,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ofivirtualapp.R
 
-// --- 1. El Composable principal de la pantalla ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MetodosPagoScreen(
     onNavigateBack: () -> Unit,
-    onOpenWhatsApp: (String) -> Unit // Recibe la función para abrir el link
+    onOpenWhatsApp: (String) -> Unit
 ) {
-    val numeroWhatsapp = "+56912345678" // Reemplaza con tu número de WhatsApp
+    val numeroWhatsapp = "+56928532988"
     val mensajeWhatsapp = "Hola, adjunto mi comprobante de pago."
     val linkWhatsapp = "https://wa.me/$numeroWhatsapp?text=${mensajeWhatsapp.replace(" ", "%20")}"
 
@@ -45,6 +45,7 @@ fun MetodosPagoScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -55,7 +56,7 @@ fun MetodosPagoScreen(
             )
             Spacer(Modifier.height(16.dp))
 
-            // --- Tarjeta con los datos de la transferencia ---
+            // Tarjeta con los datos de la transferencia
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -77,7 +78,7 @@ fun MetodosPagoScreen(
 
             Spacer(Modifier.height(24.dp))
 
-            // --- Tarjeta de instrucción para WhatsApp ---
+            // Tarjeta de instrucción para WhatsApp
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape = RoundedCornerShape(12.dp),
@@ -100,20 +101,21 @@ fun MetodosPagoScreen(
                         textAlign = TextAlign.Center,
                         color = MaterialTheme.colorScheme.onTertiaryContainer
                     )
+
                     Spacer(Modifier.height(16.dp))
                     Button(
                         onClick = { onOpenWhatsApp(linkWhatsapp) },
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF25D366), // Color de WhatsApp
+                            containerColor = Color(0xFF25D366),
                             contentColor = Color.White
                         )
                     ) {
                         Icon(
-                            painter = painterResource(id = R.drawable.ic_whatsapp), // Necesitarás un ícono de WhatsApp
-                            contentDescription = "WhatsApp",
-                            modifier = Modifier.size(20.dp)
+                            painter = painterResource(id = R.drawable.ic_whatsapp),
+                            contentDescription = null,
+                            modifier = Modifier.size(ButtonDefaults.IconSize)
                         )
-                        Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.size(ButtonDefaults.IconSpacing))
                         Text("Enviar Comprobante")
                     }
                 }
@@ -122,7 +124,7 @@ fun MetodosPagoScreen(
     }
 }
 
-// --- 2. Composable auxiliar para las filas de información ---
+
 @Composable
 private fun InfoRow(label: String, value: String) {
     Row(

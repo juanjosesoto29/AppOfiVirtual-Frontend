@@ -35,12 +35,11 @@ import com.example.ofivirtualapp.viewmodel.AuthViewModel
 import com.example.ofivirtualapp.viewmodel.CartViewModel
 import com.example.ofivirtualapp.viewmodel.PerfilViewModel
 import kotlinx.coroutines.launch
-// Agrega esta línea junto con tus otros imports de 'androidx.compose.ui.platform'
 import androidx.compose.ui.platform.LocalUriHandler
 
 @Composable
 fun AppNavGraph(authViewModel: AuthViewModel,
-                perfilViewModel: PerfilViewModel) { // Corregido: Nombre del Composable
+                perfilViewModel: PerfilViewModel) {
 
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
@@ -91,7 +90,6 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                             navigateAndClearStack(Route.Onboarding.path)
                         }
                     },
-                    // Pasamos lambdas vacías para los parámetros no usados para evitar errores
                     onRenewPlan = { goTo(Route.OficinaVirtual.path) },
                     onGoOficinaVirtual = { goTo(Route.OficinaVirtual.path) },
                     onGoContabilidad = { goTo(Route.Contabilidad.path) },
@@ -100,7 +98,6 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                         try {
                             uriHandler.openUri(url)
                         } catch (e: Exception) {
-                            // Opcional: Mostrar un Toast si no se puede abrir la URL
                             Toast.makeText(context, "No se ha cargado el contrato", Toast.LENGTH_SHORT).show()
                         }
                     },
@@ -116,7 +113,7 @@ fun AppNavGraph(authViewModel: AuthViewModel,
             composable(Route.Login.path) {
                 LoginScreenVm(
                     vm = authViewModel,
-                    userPrefs = userPrefs, // 🔹 PASA LA INSTANCIA CORRECTA
+                    userPrefs = userPrefs,
                     onLoginOkNavigateHome = { navigateAndClearStack(Route.Home.path) },
                     onGoRegister = goRegister
                 )
@@ -129,10 +126,10 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                 )
             }
             composable(Route.Perfil.path) {
-                val perfilState by perfilViewModel.uiState.collectAsState() // State se accede con .value
+                val perfilState by perfilViewModel.uiState.collectAsState()
                 PerfilScreen(
                     perfilViewModel = perfilViewModel,
-                    uiState = perfilState, // Pasamos el estado
+                    uiState = perfilState,
                     onAvatarChange = { perfilViewModel.onAvatarChange(it) },
                     onVerContratos = { goTo(Route.MisContratos.path) },
                     onMetodosPago = { goTo(Route.MetodosPago.path) },
@@ -152,7 +149,7 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                     onNavigateBack = { navController.popBackStack() },
                     onOpenContrato = { url ->
                         try {
-                            uriHandler.openUri(url) // Reutilizamos el uriHandler
+                            uriHandler.openUri(url)
                         } catch (e: Exception) {
                             Toast.makeText(context, "No se pudo abrir el contrato", Toast.LENGTH_SHORT).show()
                         }
@@ -161,9 +158,9 @@ fun AppNavGraph(authViewModel: AuthViewModel,
             }
             composable(Route.Servicios.path) {
                 ServiciosScreen(
-                    onAddToCart = { servicio -> // La lambda recibe un ServicioUI
+                    onAddToCart = { servicio ->
                         Toast.makeText(context, "${servicio.nombre} agregado", Toast.LENGTH_SHORT).show()
-                        cartViewModel.addItem(servicio) // Y se lo pasa al ViewModel
+                        cartViewModel.addItem(servicio)
                     },
                     onGoToPlanFull = { goTo(Route.PlanFull.path) }
                 )
@@ -182,7 +179,6 @@ fun AppNavGraph(authViewModel: AuthViewModel,
             }
             composable(Route.PasswordRecovery.path) { PlaceholderScreen("Recuperar Contraseña", navController) }
 
-            // 🔹 INICIO DE LA CORRECCIÓN EN LAS RUTAS DE SERVICIOS 🔹
             composable(Route.OficinaVirtual.path) {
                 OficinaVirtualScreen(onAddToCart = { planOV ->
                     val servicio = ServicioUI(
@@ -191,7 +187,7 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                         descripcion = "Plan de ${planOV.duracionMeses} meses. " + planOV.bullets.joinToString(" "),
                         precioCLP = planOV.precioCLP
                     )
-                    cartViewModel.addItem(servicio) // Pasamos el objeto ServicioUI
+                    cartViewModel.addItem(servicio)
                     Toast.makeText(context, "${servicio.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
                 })
             }
@@ -203,7 +199,7 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                         descripcion = servicioConta.descripcion,
                         precioCLP = servicioConta.precioCLP
                     )
-                    cartViewModel.addItem(servicio) // Pasamos el objeto ServicioUI
+                    cartViewModel.addItem(servicio)
                     Toast.makeText(context, "${servicio.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
                 })
             }
@@ -215,17 +211,16 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                         descripcion = servicioFormalizacion.descripcion,
                         precioCLP = servicioFormalizacion.precioCLP
                     )
-                    cartViewModel.addItem(servicio) // Pasamos el objeto ServicioUI
+                    cartViewModel.addItem(servicio)
                     Toast.makeText(context, "${servicio.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
                 })
             }
             composable(Route.PlanFull.path) {
                 PlanFullScreen(
                     onNavigateBack = { navController.popBackStack() },
-                    onAddToCart = { servicio -> cartViewModel.addItem(servicio) } // Pasamos el objeto ServicioUI
+                    onAddToCart = { servicio -> cartViewModel.addItem(servicio) }
                 )
             }
-            // 🔹 FIN DE LA CORRECCIÓN 🔹
 
             composable(Route.Notificaciones.path) { NotificacionesScreen(onNavigateBack = { navController.popBackStack() }) }
             composable(Route.MetodosPago.path) {
@@ -233,7 +228,6 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                     onNavigateBack = { navController.popBackStack() },
                     onOpenWhatsApp = { url ->
                         try {
-                            // Reutilizamos el uriHandler que ya está disponible en este scope
                             uriHandler.openUri(url)
                         } catch (e: Exception) {
                             Toast.makeText(context, "No se pudo abrir WhatsApp", Toast.LENGTH_SHORT).show()

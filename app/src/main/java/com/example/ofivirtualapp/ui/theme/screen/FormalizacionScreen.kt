@@ -18,7 +18,6 @@ fun FormalizacionScreen(
 ) {
     val OfiBlue = Color(0xFF071290)
 
-    // Lista base de servicios de Formalización
     val servicios = remember {
         listOf(
             ServicioFormalizacion(
@@ -55,14 +54,14 @@ fun FormalizacionScreen(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 16.dp, vertical = 12.dp)
     ) {
-        // Encabezado
+
         Text(
             text = "Formalización",
             style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.SemiBold)
         )
         Spacer(Modifier.height(12.dp))
 
-        // Lista de servicios
+
         servicios.forEachIndexed { idx, servicio ->
             ServicioFormalizacionCard(
                 servicio = servicio,
@@ -76,15 +75,12 @@ fun FormalizacionScreen(
     }
 }
 
-/* ----------------- MODELO ----------------- */
 
 data class ServicioFormalizacion(
     val nombre: String,
     val descripcion: String,
     val precioCLP: Int
 )
-
-/* ----------------- UI COMPONENT (CON DISEÑO ACTUALIZADO) ----------------- */
 
 @Composable
 private fun ServicioFormalizacionCard(
@@ -99,7 +95,6 @@ private fun ServicioFormalizacionCard(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Column(Modifier.padding(16.dp)) {
-            // --- CAMBIO DE DISEÑO APLICADO AQUÍ ---
 
             // 1. Nombre del servicio
             Text(
@@ -142,8 +137,6 @@ private fun ServicioFormalizacionCard(
         }
     }
 }
-
-/* ----------------- UTILIDAD ----------------- */
 
 private fun Int.toCLP(): String {
     if (this == 0) return "$0"

@@ -12,11 +12,10 @@ import com.example.ofivirtualapp.navigation.Destination
 
 @Composable
 fun BottomNavBar(navController: NavController) {
-    // Obtenemos la ruta actual para saber qué ítem resaltar
+
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
-    // Lista de destinos que se mostrarán en la barra de navegación
     val navigationItems = listOf(
         Destination.HOME,
         Destination.SERVICIOS,
@@ -24,23 +23,19 @@ fun BottomNavBar(navController: NavController) {
         Destination.PERFIL
     )
 
-    // Solo mostramos la barra de navegación si la ruta actual es una de las principales
     if (currentRoute in navigationItems.map { it.route }) {
         NavigationBar {
             navigationItems.forEach { item ->
                 NavigationBarItem(
-                    selected = currentRoute == item.route, // Resalta el ítem si la ruta coincide
+                    selected = currentRoute == item.route,
                     onClick = {
                         navController.navigate(item.route) {
-                            // Navega al inicio del grafo para evitar acumular pantallas
                             navController.graph.startDestinationRoute?.let { route ->
                                 popUpTo(route) {
                                     saveState = true
                                 }
                             }
-                            // Evita crear una nueva instancia de la misma pantalla
                             launchSingleTop = true
-                            // Restaura el estado al volver a seleccionar un ítem
                             restoreState = true
                         }
                     },
