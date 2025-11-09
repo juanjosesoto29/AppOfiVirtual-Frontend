@@ -47,7 +47,9 @@ fun PerfilScreen(
     onNotificaciones: () -> Unit = {},
     onAyuda: () -> Unit = {},
     onRenovarPlan: () -> Unit = {},
+    onDatosEmpresa: () -> Unit,
     onCerrarSesion: () -> Unit = {}
+
 ) {
     LaunchedEffect(Unit) {
         perfilViewModel.loadUserProfile()
@@ -224,6 +226,14 @@ fun PerfilScreen(
                 }
             }
             Spacer(Modifier.height(16.dp))
+            Button(
+                onClick = { onDatosEmpresa() },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("Datos de la Empresa")
+            }
+
+            Spacer(Modifier.height(8.dp))
 
             Column(verticalArrangement = Arrangement.spacedBy(10.dp)) {
                 PerfilItem( icon = Icons.Outlined.Description, title = "Contratos", subtitle = "Documentos y estados", onClick = onVerContratos)
