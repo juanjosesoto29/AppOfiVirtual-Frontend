@@ -14,6 +14,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ofivirtualapp.data.remote.EmpresaRequest
 import com.example.ofivirtualapp.data.remote.EmpresaResponse
 import com.example.ofivirtualapp.viewmodel.EmpresaViewModel
+import com.example.ofivirtualapp.data.local.ChileGeoData
+
 
 @Composable
 fun EmpresaScreenVm(
@@ -211,48 +213,139 @@ private fun EmpresaScreen(
                     Text("Ubicación", style = MaterialTheme.typography.titleMedium)
                     Spacer(Modifier.height(8.dp))
 
+// Dirección exacta (se mantiene igual)
                     OutlinedTextField(
                         value = form.direccion,
                         onValueChange = { form = form.copy(direccion = it) },
-                        label = { Text("Dirección") },
+                        label = { Text("Dirección exacta (calle, número, depto)") },
                         singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier
+                            .fillMaxWidth()
+
                     )
+
+                    Spacer(Modifier.height(12.dp))
+
+// --- Variables para desplegables ---
+                    var expandedRegion by remember { mutableStateOf(false) }
+                    var expandedCiudad by remember { mutableStateOf(false) }
+                    var expandedComuna by remember { mutableStateOf(false) }
+
+// --- Datos desde ChileGeoData ---
+                    val regiones = ChileGeoData.regiones
+                    val ciudades = ChileGeoData.estructura[form.region]?.keys?.toList() ?: emptyList()
+                    val comunas = ChileGeoData.estructura[form.region]?.get(form.ciudad) ?: emptyList()
+
+// --- Región ---
+                    ExposedDropdownMenuBox(
+                        expanded = expandedRegion,
+                        onExpandedChange = { expandedRegion = !expandedRegion }
+                    ) {
+                        OutlinedTextField(
+                            readOnly = true,
+                            value = form.region,
+                            onValueChange = {},
+                            label = { Text("Región") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedRegion)
+                            },
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedRegion,
+                            onDismissRequest = { expandedRegion = false }
+                        ) {
+                            regiones.forEach { region ->
+                                DropdownMenuItem(
+                                    text = { Text(region) },
+                                    onClick = {
+                                        form = form.copy(region = region, ciudad = "", comuna = "")
+                                        expandedRegion = false
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     Spacer(Modifier.height(8.dp))
 
-                    OutlinedTextField(
-                        value = form.comuna,
-                        onValueChange = { form = form.copy(comuna = it) },
-                        label = { Text("Comuna") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+// --- Ciudad / Provincia ---
+                    ExposedDropdownMenuBox(
+                        expanded = expandedCiudad,
+                        onExpandedChange = { expandedCiudad = !expandedCiudad }
+                    ) {
+                        OutlinedTextField(
+                            readOnly = true,
+                            value = form.ciudad,
+                            onValueChange = {},
+                            label = { Text("Ciudad / Provincia") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedCiudad)
+                            },
+                            enabled = ciudades.isNotEmpty(),
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedCiudad,
+                            onDismissRequest = { expandedCiudad = false }
+                        ) {
+                            ciudades.forEach { ciudad ->
+                                DropdownMenuItem(
+                                    text = { Text(ciudad) },
+                                    onClick = {
+                                        form = form.copy(ciudad = ciudad, comuna = "")
+                                        expandedCiudad = false
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     Spacer(Modifier.height(8.dp))
 
-                    OutlinedTextField(
-                        value = form.ciudad,
-                        onValueChange = { form = form.copy(ciudad = it) },
-                        label = { Text("Ciudad") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
+// --- Comuna ---
+                    ExposedDropdownMenuBox(
+                        expanded = expandedComuna,
+                        onExpandedChange = { expandedComuna = !expandedComuna }
+                    ) {
+                        OutlinedTextField(
+                            readOnly = true,
+                            value = form.comuna,
+                            onValueChange = {},
+                            label = { Text("Comuna") },
+                            trailingIcon = {
+                                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expandedComuna)
+                            },
+                            enabled = comunas.isNotEmpty(),
+                            modifier = Modifier
+                                .menuAnchor()
+                                .fillMaxWidth()
+                        )
+                        ExposedDropdownMenu(
+                            expanded = expandedComuna,
+                            onDismissRequest = { expandedComuna = false }
+                        ) {
+                            comunas.forEach { comuna ->
+                                DropdownMenuItem(
+                                    text = { Text(comuna) },
+                                    onClick = {
+                                        form = form.copy(comuna = comuna)
+                                        expandedComuna = false
+                                    }
+                                )
+                            }
+                        }
+                    }
 
                     Spacer(Modifier.height(8.dp))
 
+// --- País (simple) ---
                     OutlinedTextField(
-                        value = form.region,
-                        onValueChange = { form = form.copy(region = it) },
-                        label = { Text("Región") },
-                        singleLine = true,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-
-                    Spacer(Modifier.height(8.dp))
-
-                    OutlinedTextField(
-                        value = form.pais,
+                        value = form.pais.ifBlank { "Chile" },
                         onValueChange = { form = form.copy(pais = it) },
                         label = { Text("País") },
                         singleLine = true,
@@ -260,6 +353,7 @@ private fun EmpresaScreen(
                     )
 
                     Spacer(Modifier.height(16.dp))
+
 
                     // ========= CONTACTO EMPRESA =========
                     Text("Contacto de la empresa", style = MaterialTheme.typography.titleMedium)
