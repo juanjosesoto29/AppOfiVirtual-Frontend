@@ -2,177 +2,283 @@ package com.example.ofivirtualapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.delay
+import com.example.ofivirtualapp.data.remote.RetrofitClient
+import com.example.ofivirtualapp.data.repository.AuthRepository
+import com.example.ofivirtualapp.domain.validation.validateEmail
+import com.example.ofivirtualapp.domain.validation.validateNameLettersOnly
+import com.example.ofivirtualapp.domain.validation.validatePhoneDigitsOnly
+import com.example.ofivirtualapp.domain.validation.validateStrongPassword
+import com.example.ofivirtualapp.domain.validation.validateConfirm
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import com.example.ofivirtualapp.domain.validation.*
-import com.example.ofivirtualapp.data.repository.UserRepository
 
-data class LoginUiState(                                   // Estado de la pantalla Login
-    val email: String = "",                                // Campo email
-    val pass: String = "",                                 // Campo contraseña (texto)
-    val emailError: String? = null,                        // Error de email
-    val passError: String? = null,                         // (Opcional) error de pass en login
-    val isSubmitting: Boolean = false,                     // Flag de carga
-    val canSubmit: Boolean = false,                        // Habilitar botón
-    val success: Boolean = false,                          // Resultado OK
-    val errorMsg: String? = null                           // Error global (credenciales inválidas)
+// -----------------------------
+// UI STATE: LOGIN
+// -----------------------------
+data class LoginUiState(
+    val email: String = "",
+    val pass: String = "",
+    val emailError: String? = null,
+    val passError: String? = null,
+    val canSubmit: Boolean = false,
+    val isSubmitting: Boolean = false,
+    val errorMsg: String? = null,
+    val success: Boolean = false,
+    val userId: Long? = null
 )
 
-data class RegisterUiState(                                // Estado de la pantalla Registro (<= 5 campos)
-    val name: String = "",                                 // 1) Nombre
-    val email: String = "",                                // 2) Email
-    val phone: String = "",                                // 3) Teléfono
-    val pass: String = "",                                 // 4) Contraseña
-    val confirm: String = "",                              // 5) Confirmación
 
-    val nameError: String? = null,                         // Errores por campo
+// -----------------------------
+// UI STATE: REGISTER
+// -----------------------------
+data class RegisterUiState(
+    val name: String = "",
+    val email: String = "",
+    val phone: String = "",
+    val pass: String = "",
+    val confirm: String = "",
+    val nameError: String? = null,
     val emailError: String? = null,
     val phoneError: String? = null,
     val passError: String? = null,
     val confirmError: String? = null,
-
-    val isSubmitting: Boolean = false,                     // Flag de carga
-    val canSubmit: Boolean = false,                        // Habilitar botón
-    val success: Boolean = false,                          // Resultado OK
-    val errorMsg: String? = null                           // Error global (ej: duplicado)
+    val canSubmit: Boolean = false,
+    val isSubmitting: Boolean = false,
+    val errorMsg: String? = null,
+    val success: Boolean = false
 )
 
+class AuthViewModel : ViewModel() {
 
-class AuthViewModel(
-    //  4.- inyectamos el repositorio real que usa Room/SQLite
-    private val repository: UserRepository
-) : ViewModel() {                         // ViewModel que maneja Login/Registro
+    // Repositorio que llama al microservicio usuarios-servicio
+    private val repository = AuthRepository(RetrofitClient.userApi)
 
-    // 3.- Eliminamos Colección **estática** en memoria compartida entre instancias del VM (sin storage persistente)
+    // -------- LOGIN --------
+    private val _login = MutableStateFlow(LoginUiState())
+    val login: StateFlow<LoginUiState> = _login.asStateFlow()
 
+    // -------- REGISTER --------
+    private val _register = MutableStateFlow(RegisterUiState())
+    val register: StateFlow<RegisterUiState> = _register.asStateFlow()
 
-    // Flujos de estado para observar desde la UI
-    private val _login = MutableStateFlow(LoginUiState())   // Estado interno (Login)
-    val login: StateFlow<LoginUiState> = _login             // Exposición inmutable
-
-    private val _register = MutableStateFlow(RegisterUiState()) // Estado interno (Registro)
-    val register: StateFlow<RegisterUiState> = _register        // Exposición inmutable
-
-    // ----------------- LOGIN: handlers y envío -----------------
-
-    fun onLoginEmailChange(value: String) {                 // Handler cuando cambia el email
-        _login.update { it.copy(email = value, emailError = validateEmail(value)) } // Guardamos + validamos
-        recomputeLoginCanSubmit()                           // Recalculamos habilitado
+    // ============================================================
+    // LOGIN: HANDLERS DE CAMBIO DE CAMPOS
+    // ============================================================
+    fun onLoginEmailChange(value: String) {
+        val error = validateEmail(value)
+        val current = _login.value.copy(
+            email = value,
+            emailError = error
+        )
+        _login.value = current.copy(
+            canSubmit = canLoginSubmit(current, passwordError = current.passError)
+        )
     }
 
-    fun onLoginPassChange(value: String) {                  // Handler cuando cambia la contraseña
-        _login.update { it.copy(pass = value) }             // Guardamos (sin validar fuerza aquí)
-        recomputeLoginCanSubmit()                           // Recalculamos habilitado
+    fun onLoginPassChange(value: String) {
+        // Para login basta con que no esté vacío (puedes endurecer si quieres)
+        val error = if (value.isBlank()) "La contraseña es obligatoria" else null
+        val current = _login.value.copy(
+            pass = value,
+            passError = error
+        )
+        _login.value = current.copy(
+            canSubmit = canLoginSubmit(current, passwordError = error)
+        )
     }
 
-    private fun recomputeLoginCanSubmit() {                 // Regla para habilitar botón "Entrar"
-        val s = _login.value                                // Tomamos el estado actual
-        val can = s.emailError == null &&                   // Email válido
-                s.email.isNotBlank() &&                   // Email no vacío
-                s.pass.isNotBlank()                       // Password no vacía
-        _login.update { it.copy(canSubmit = can) }          // Actualizamos el flag
+    private fun canLoginSubmit(state: LoginUiState, passwordError: String?): Boolean {
+        return state.email.isNotBlank() &&
+                state.emailError == null &&
+                state.pass.isNotBlank() &&
+                passwordError == null &&
+                !state.isSubmitting
     }
 
-    fun submitLogin() {                                     // Acción de login (simulación async)
-        val s = _login.value                                // Snapshot del estado
-        if (!s.canSubmit || s.isSubmitting) return          // Si no se puede o ya está cargando, salimos
-        viewModelScope.launch {                             // Lanzamos corrutina
-            _login.update { it.copy(isSubmitting = true, errorMsg = null, success = false) } // Seteamos loading
-            delay(500)                                      // Simulamos tiempo de verificación
+    // ============================================================
+    // LOGIN: SUBMIT
+    // ============================================================
+    fun submitLogin() {
+        val state = _login.value
 
-            //6.- Se cambia lo anterior por esto ✅ NUEVO: consulta real a la BD vía repositorio
-            val result = repository.login(s.email.trim(), s.pass)
+        // Validación simple antes de llamar al backend
+        val emailError = validateEmail(state.email)
+        val passError = if (state.pass.isBlank()) "La contraseña es obligatoria" else null
 
-            // Interpreta el resultado y actualiza estado
-            _login.update {
-                if (result.isSuccess) {
-                    it.copy(isSubmitting = false, success = true, errorMsg = null) // OK: éxito
-                } else {
-                    it.copy(isSubmitting = false, success = false,
-                        errorMsg = result.exceptionOrNull()?.message ?: "Error de autenticación")
-                }
-            }
+        if (emailError != null || passError != null) {
+            _login.value = state.copy(
+                emailError = emailError,
+                passError = passError,
+                canSubmit = false
+            )
+            return
         }
-    }
 
-    fun clearLoginResult() {                                // Limpia banderas tras navegar
-        _login.update { it.copy(success = false, errorMsg = null) }
-    }
-
-    // ----------------- REGISTRO: handlers y envío -----------------
-
-    fun onNameChange(value: String) {                       // Handler del nombre
-        val filtered = value.filter { it.isLetter() || it.isWhitespace() } // Filtramos números/símbolos (solo letras/espacios)
-        _register.update {                                  // Guardamos + validamos
-            it.copy(name = filtered, nameError = validateNameLettersOnly(filtered))
-        }
-        recomputeRegisterCanSubmit()                        // Recalculamos habilitado
-    }
-
-    fun onRegisterEmailChange(value: String) {              // Handler del email
-        _register.update { it.copy(email = value, emailError = validateEmail(value)) } // Guardamos + validamos
-        recomputeRegisterCanSubmit()
-    }
-
-    fun onPhoneChange(value: String) {                      // Handler del teléfono
-        val digitsOnly = value.filter { it.isDigit() }      // Dejamos solo dígitos
-        _register.update {                                  // Guardamos + validamos
-            it.copy(phone = digitsOnly, phoneError = validatePhoneDigitsOnly(digitsOnly))
-        }
-        recomputeRegisterCanSubmit()
-    }
-
-    fun onRegisterPassChange(value: String) {               // Handler de la contraseña
-        _register.update { it.copy(pass = value, passError = validateStrongPassword(value)) } // Validamos seguridad
-        // Revalidamos confirmación con la nueva contraseña
-        _register.update { it.copy(confirmError = validateConfirm(it.pass, it.confirm)) }
-        recomputeRegisterCanSubmit()
-    }
-
-    fun onConfirmChange(value: String) {                    // Handler de confirmación
-        _register.update { it.copy(confirm = value, confirmError = validateConfirm(it.pass, value)) } // Guardamos + validamos
-        recomputeRegisterCanSubmit()
-    }
-
-    private fun recomputeRegisterCanSubmit() {              // Habilitar "Registrar" si todo OK
-        val s = _register.value                              // Tomamos el estado actual
-        val noErrors = listOf(s.nameError, s.emailError, s.phoneError, s.passError, s.confirmError).all { it == null } // Sin errores
-        val filled = s.name.isNotBlank() && s.email.isNotBlank() && s.phone.isNotBlank() && s.pass.isNotBlank() && s.confirm.isNotBlank() // Todo lleno
-        _register.update { it.copy(canSubmit = noErrors && filled) } // Actualizamos flag
-    }
-
-    fun submitRegister() {                                  // Acción de registro (simulación async)
-        val s = _register.value                              // Snapshot del estado
-        if (!s.canSubmit || s.isSubmitting) return          // Evitamos reentradas
-        viewModelScope.launch {                             // Corrutina
-            _register.update { it.copy(isSubmitting = true, errorMsg = null, success = false) } // Loading
-            delay(700)                                      // Simulamos IO
-
-            // 7.- Se cambia esto por lo anterior NUEVO: inserta en BD (con teléfono) vía repositorio
-            val result = repository.register(
-                name = s.name.trim(),
-                email = s.email.trim(),
-                phone = s.phone.trim(),                     // Incluye teléfono
-                password = s.pass
+        viewModelScope.launch {
+            _login.value = state.copy(
+                isSubmitting = true,
+                errorMsg = null,
+                success = false
             )
 
-            // Interpreta resultado y actualiza estado
-            _register.update {
-                if (result.isSuccess) {
-                    it.copy(isSubmitting = false, success = true, errorMsg = null)  // OK
-                } else {
-                    it.copy(isSubmitting = false, success = false,
-                        errorMsg = result.exceptionOrNull()?.message ?: "No se pudo registrar")
+            val result = repository.login(state.email, state.pass)
+
+            result
+                .onSuccess { user ->
+                    _login.value = _login.value.copy(
+                        isSubmitting = false,
+                        success = true,
+                        errorMsg = null,
+                        userId = user.id,
+                        // opcional: email = user.email (por si quieres refrescar)
+                    )
                 }
-            }
+                .onFailure { e ->
+                    _login.value = _login.value.copy(
+                        isSubmitting = false,
+                        success = false,
+                        errorMsg = e.message ?: "Error al iniciar sesión"
+                    )
+                }
         }
     }
 
-    fun clearRegisterResult() {                             // Limpia banderas tras navegar
-        _register.update { it.copy(success = false, errorMsg = null) }
+    fun clearLoginResult() {
+        _login.value = _login.value.copy(
+            success = false,
+            errorMsg = null,
+            isSubmitting = false
+        )
     }
 
+    // ============================================================
+    // REGISTER: HANDLERS DE CAMBIO DE CAMPOS
+    // ============================================================
+    fun onRegisterNameChange(value: String) {
+        val error = validateNameLettersOnly(value)
+        updateRegister { it.copy(name = value, nameError = error) }
+    }
+
+    fun onRegisterEmailChange(value: String) {
+        val error = validateEmail(value)
+        updateRegister { it.copy(email = value, emailError = error) }
+    }
+
+    fun onRegisterPhoneChange(value: String) {
+        val error = validatePhoneDigitsOnly(value)
+        updateRegister { it.copy(phone = value, phoneError = error) }
+    }
+
+    fun onRegisterPassChange(value: String) {
+        val error = validateStrongPassword(value)
+        // confirm también podría invalidarse
+        val confirmError = validateConfirm(value, _register.value.confirm)
+        updateRegister {
+            it.copy(pass = value, passError = error, confirmError = confirmError)
+        }
+    }
+
+    fun onRegisterConfirmChange(value: String) {
+        val error = validateConfirm(_register.value.pass, value)
+        updateRegister { it.copy(confirm = value, confirmError = error) }
+    }
+
+    private fun updateRegister(transform: (RegisterUiState) -> RegisterUiState) {
+        val newState = transform(_register.value)
+        val canSubmit = with(newState) {
+            nameError == null &&
+                    emailError == null &&
+                    phoneError == null &&
+                    passError == null &&
+                    confirmError == null &&
+                    name.isNotBlank() &&
+                    email.isNotBlank() &&
+                    phone.isNotBlank() &&
+                    pass.isNotBlank() &&
+                    confirm.isNotBlank() &&
+                    !isSubmitting
+        }
+        _register.value = newState.copy(canSubmit = canSubmit)
+    }
+
+    // ============================================================
+    // REGISTER: SUBMIT
+    // ============================================================
+    fun submitRegister() {
+        val state = _register.value
+
+        // Chequeo rápido: si no se puede enviar, no seguimos
+        if (!state.canSubmit) {
+            // Forzamos validación por si llegó aquí sin pasar por updateRegister
+            val nameError = validateNameLettersOnly(state.name)
+            val emailError = validateEmail(state.email)
+            val phoneError = validatePhoneDigitsOnly(state.phone)
+            val passError = validateStrongPassword(state.pass)
+            val confirmError = validateConfirm(state.pass, state.confirm)
+
+            val canSubmitFixed =
+                nameError == null &&
+                        emailError == null &&
+                        phoneError == null &&
+                        passError == null &&
+                        confirmError == null &&
+                        state.name.isNotBlank() &&
+                        state.email.isNotBlank() &&
+                        state.phone.isNotBlank() &&
+                        state.pass.isNotBlank() &&
+                        state.confirm.isNotBlank()
+
+            _register.value = state.copy(
+                nameError = nameError,
+                emailError = emailError,
+                phoneError = phoneError,
+                passError = passError,
+                confirmError = confirmError,
+                canSubmit = canSubmitFixed
+            )
+
+            if (!canSubmitFixed) return
+        }
+
+        viewModelScope.launch {
+            _register.value = _register.value.copy(
+                isSubmitting = true,
+                errorMsg = null,
+                success = false
+            )
+
+            val result = repository.register(
+                name = state.name,
+                email = state.email,
+                phone = state.phone,
+                password = state.pass
+            )
+
+            result
+                .onSuccess { _ ->
+                    _register.value = _register.value.copy(
+                        isSubmitting = false,
+                        success = true,
+                        errorMsg = null
+                    )
+                }
+                .onFailure { e ->
+                    _register.value = _register.value.copy(
+                        isSubmitting = false,
+                        success = false,
+                        errorMsg = e.message ?: "Error al registrar usuario"
+                    )
+                }
+        }
+    }
+
+    fun clearRegisterResult() {
+        _register.value = _register.value.copy(
+            success = false,
+            errorMsg = null,
+            isSubmitting = false
+        )
+    }
 }

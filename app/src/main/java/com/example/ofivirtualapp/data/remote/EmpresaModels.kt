@@ -1,0 +1,60 @@
+package com.example.ofivirtualapp.data.remote
+
+data class EmpresaRequest(
+    val userId: Long,
+    val rut: String,
+    val razonSocial: String,
+    val nombreFantasia: String?,
+    val giro: String?,
+    val fechaInicioActividades: String?, // "YYYY-MM-DD"
+    val tipoEmpresa: String?,
+    val direccion: String?,
+    val comuna: String?,
+    val ciudad: String?,
+    val region: String?,
+    val pais: String?,
+    val telefonoEmpresa: String?,
+    val emailEmpresa: String?,
+    val sitioWeb: String?,
+    val regimenTributario: String?,
+    val contabilidadCompleta: Boolean?,
+    val tipoContabilidad: String, // OFIVIRTUAL / EXTERNA / SIN_CONTABILIDAD
+    val contaFechaInicioOfivirtual: String?,
+    val contaFechaTerminoOfivirtual: String?,
+    val contaEstado: String?,
+    val contaExternaNombreEstudio: String?,
+    val contaExternaContactoNombre: String?,
+    val contaExternaEmail: String?,
+    val contaExternaTelefono: String?,
+    val contaExternaObservaciones: String?
+)
+
+data class EmpresaResponse(
+    val id: Long,
+    val userId: Long,
+    val rut: String,
+    val razonSocial: String,
+    val nombreFantasia: String?,
+    val giro: String?,
+    val fechaInicioActividades: String?,
+    val tipoEmpresa: String?,
+    val direccion: String?,
+    val comuna: String?,
+    val ciudad: String?,
+    val region: String?,
+    val pais: String?,
+    val telefonoEmpresa: String?,
+    val emailEmpresa: String?,
+    val sitioWeb: String?,
+    val regimenTributario: String?,
+    val contabilidadCompleta: Boolean?,
+    val tipoContabilidad: String,
+    val contaFechaInicioOfivirtual: String?,
+    val contaFechaTerminoOfivirtual: String?,
+    val contaEstado: String?,
+    val contaExternaNombreEstudio: String?,
+    val contaExternaContactoNombre: String?,
+    val contaExternaEmail: String?,
+    val contaExternaTelefono: String?,
+    val contaExternaObservaciones: String?
+)

@@ -29,6 +29,8 @@ sealed class Route(val path: String) {
     object PlanFull : Route("plan_full")
     object Checkout : Route("checkout/{total}")
     object MisContratos : Route("mis_contratos")
+    object Empresa : Route("empresa")
+
 
 
 }

@@ -1,23 +1,20 @@
 package com.example.ofivirtualapp.ui.theme.screen
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.*
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
-
 
 @Composable
 fun RegisterScreenVm(
@@ -27,9 +24,11 @@ fun RegisterScreenVm(
 ) {
     val state by vm.register.collectAsStateWithLifecycle()
 
-    if (state.success) {
-        vm.clearRegisterResult()
-        onRegisteredNavigateLogin()
+    LaunchedEffect(state.success) {
+        if (state.success) {
+            vm.clearRegisterResult()
+            onRegisteredNavigateLogin()
+        }
     }
 
     RegisterScreen(
@@ -46,11 +45,11 @@ fun RegisterScreenVm(
         canSubmit = state.canSubmit,
         isSubmitting = state.isSubmitting,
         errorMsg = state.errorMsg,
-        onNameChange = vm::onNameChange,
+        onNameChange = vm::onRegisterNameChange,
         onEmailChange = vm::onRegisterEmailChange,
-        onPhoneChange = vm::onPhoneChange,
+        onPhoneChange = vm::onRegisterPhoneChange,
         onPassChange = vm::onRegisterPassChange,
-        onConfirmChange = vm::onConfirmChange,
+        onConfirmChange = vm::onRegisterConfirmChange,
         onSubmit = vm::submitRegister,
         onGoLogin = onGoLogin
     )
@@ -83,7 +82,6 @@ private fun RegisterScreen(
     var showPass by remember { mutableStateOf(false) }
     var showConfirm by remember { mutableStateOf(false) }
 
-
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -92,46 +90,37 @@ private fun RegisterScreen(
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
+                modifier = Modifier.fillMaxWidth(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Registro",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Spacer(Modifier.height(12.dp))
+                Text("Crear cuenta", style = MaterialTheme.typography.headlineSmall)
+                Spacer(Modifier.height(20.dp))
 
-                // --- FORMULARIO
                 OutlinedTextField(
                     value = name,
                     onValueChange = onNameChange,
-                    label = { Text("Nombre") },
+                    label = { Text("Nombre completo") },
                     singleLine = true,
                     isError = nameError != null,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
                     modifier = Modifier.fillMaxWidth()
                 )
-                if (nameError != null) {
+                if (nameError != null)
                     Text(nameError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-                }
 
                 Spacer(Modifier.height(8.dp))
 
                 OutlinedTextField(
                     value = email,
                     onValueChange = onEmailChange,
-                    label = { Text("Email") },
+                    label = { Text("Correo electrónico") },
                     singleLine = true,
-                    isError = emailError != null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                    isError = emailError != null,
                     modifier = Modifier.fillMaxWidth()
                 )
-                if (emailError != null) {
+                if (emailError != null)
                     Text(emailError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-                }
 
                 Spacer(Modifier.height(8.dp))
 
@@ -140,13 +129,12 @@ private fun RegisterScreen(
                     onValueChange = onPhoneChange,
                     label = { Text("Teléfono") },
                     singleLine = true,
-                    isError = phoneError != null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                    isError = phoneError != null,
                     modifier = Modifier.fillMaxWidth()
                 )
-                if (phoneError != null) {
+                if (phoneError != null)
                     Text(phoneError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-                }
 
                 Spacer(Modifier.height(8.dp))
 
@@ -155,7 +143,6 @@ private fun RegisterScreen(
                     onValueChange = onPassChange,
                     label = { Text("Contraseña") },
                     singleLine = true,
-                    isError = passError != null,
                     visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showPass = !showPass }) {
@@ -165,11 +152,11 @@ private fun RegisterScreen(
                             )
                         }
                     },
+                    isError = passError != null,
                     modifier = Modifier.fillMaxWidth()
                 )
-                if (passError != null) {
+                if (passError != null)
                     Text(passError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-                }
 
                 Spacer(Modifier.height(8.dp))
 
@@ -178,21 +165,20 @@ private fun RegisterScreen(
                     onValueChange = onConfirmChange,
                     label = { Text("Confirmar contraseña") },
                     singleLine = true,
-                    isError = confirmError != null,
                     visualTransformation = if (showConfirm) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { showConfirm = !showConfirm }) {
                             Icon(
                                 imageVector = if (showConfirm) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                contentDescription = if (showConfirm) "Ocultar confirmación" else "Mostrar confirmación"
+                                contentDescription = if (showConfirm) "Ocultar contraseña" else "Mostrar contraseña"
                             )
                         }
                     },
+                    isError = confirmError != null,
                     modifier = Modifier.fillMaxWidth()
                 )
-                if (confirmError != null) {
+                if (confirmError != null)
                     Text(confirmError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-                }
 
                 Spacer(Modifier.height(16.dp))
 
@@ -206,7 +192,7 @@ private fun RegisterScreen(
                         Spacer(Modifier.width(8.dp))
                         Text("Creando cuenta...")
                     } else {
-                        Text("Registrar")
+                        Text("Registrarme")
                     }
                 }
 

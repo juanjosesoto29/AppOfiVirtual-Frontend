@@ -34,12 +34,16 @@ import com.example.ofivirtualapp.ui.theme.screen.*
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
 import com.example.ofivirtualapp.viewmodel.CartViewModel
 import com.example.ofivirtualapp.viewmodel.PerfilViewModel
+import com.example.ofivirtualapp.viewmodel.EmpresaViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalUriHandler
 
 @Composable
-fun AppNavGraph(authViewModel: AuthViewModel,
-                perfilViewModel: PerfilViewModel) {
+fun AppNavGraph(
+    authViewModel: AuthViewModel,
+    perfilViewModel: PerfilViewModel,
+    empresaViewModel: EmpresaViewModel
+) {
 
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
@@ -136,6 +140,8 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                     onNotificaciones = { goTo(Route.Notificaciones.path) },
                     onAyuda = { goTo(Route.Soporte.path) },
                     onRenovarPlan = { goTo(Route.OficinaVirtual.path) },
+                    onDatosEmpresa = { goTo(Route.Empresa.path) },
+
                     onCerrarSesion = {
                         scope.launch {
                             userPrefs.clearSession()
@@ -154,6 +160,12 @@ fun AppNavGraph(authViewModel: AuthViewModel,
                             Toast.makeText(context, "No se pudo abrir el contrato", Toast.LENGTH_SHORT).show()
                         }
                     }
+                )
+            }
+            composable(Route.Empresa.path) {
+                EmpresaScreenVm(
+                    vm = empresaViewModel,
+                    onGoBack = { navController.popBackStack() }
                 )
             }
             composable(Route.Servicios.path) {

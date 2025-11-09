@@ -10,13 +10,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.rememberNavController
 import com.example.ofivirtualapp.navigation.AppNavGraph
 import com.example.ofivirtualapp.ui.theme.OfiVirtualV3Theme
-import com.example.ofivirtualapp.data.local.database.AppDatabase
-import com.example.ofivirtualapp.data.repository.UserRepository
-import com.example.ofivirtualapp.viewmodel.AuthViewModel
-import com.example.ofivirtualapp.viewmodel.AuthViewModelFactory
 import com.example.ofivirtualapp.data.local.storage.UserPreferences
+import com.example.ofivirtualapp.viewmodel.AuthViewModel
 import com.example.ofivirtualapp.viewmodel.PerfilViewModel
 import com.example.ofivirtualapp.viewmodel.PerfilViewModelFactory
+import com.example.ofivirtualapp.viewmodel.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,39 +30,28 @@ class MainActivity : ComponentActivity() {
 fun AppRoot() {
     val context = LocalContext.current.applicationContext
 
-    val authViewModel: AuthViewModel = viewModel(
-        factory = AuthViewModelFactory(
-            UserRepository(
-                AppDatabase.getInstance(context).userDao()
-            )
-        )
-    )
+    // ViewModel de autenticación (sin factory)
+    val authViewModel: AuthViewModel = viewModel()
+
+    // Preferencias de usuario
     val userPreferences = remember { UserPreferences(context) }
-    // ^ Obtenemos el applicationContext para construir la base de datos de Room.
 
-    val db = AppDatabase.getInstance(context)
-    // ^ Singleton de Room. No crea múltiples instancias.
-
-    val userDao = db.userDao()
-    // ^ Obtenemos el DAO de usuarios desde la DB.
-
-    val userRepository = UserRepository(userDao)
-    // ^ Repositorio que encapsula la lógica de login/registro contra Room.
-
-
-    // ^ Creamos el ViewModel con factory para inyectar el repositorio.
+    // ViewModel de perfil: ahora solo necesita UserPreferences
     val perfilViewModel: PerfilViewModel = viewModel(
-        factory = PerfilViewModelFactory(userRepository, userPreferences)
+        factory = PerfilViewModelFactory(userPreferences)
     )
-    //   Esto reemplaza cualquier uso anterior de listas en memoria (USERS).
 
+    val empresaViewModel: EmpresaViewModel = viewModel(
+        factory = EmpresaViewModelFactory(userPreferences)
+    )
 
-    val navController = rememberNavController() // Controlador de navegación (igual que antes)
+    val navController = rememberNavController()
+
     OfiVirtualV3Theme {
-
         AppNavGraph(
             authViewModel = authViewModel,
-            perfilViewModel = perfilViewModel // Añadimos el nuevo parámetro
+            perfilViewModel = perfilViewModel,
+            empresaViewModel = empresaViewModel
         )
     }
 }

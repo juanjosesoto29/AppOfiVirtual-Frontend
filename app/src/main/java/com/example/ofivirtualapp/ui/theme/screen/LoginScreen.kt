@@ -7,18 +7,14 @@ import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.*
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ofivirtualapp.data.local.storage.UserPreferences
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
-
 
 @Composable
 fun LoginScreenVm(
@@ -31,12 +27,14 @@ fun LoginScreenVm(
 
     LaunchedEffect(state.success) {
         if (state.success) {
-            userPrefs.saveUserEmail(state.email)
+            state.email.let { userPrefs.saveUserEmail(it) }
+            state.userId?.let { userPrefs.saveUserId(it) }
             userPrefs.setLoggedIn(true)
             vm.clearLoginResult()
             onLoginOkNavigateHome()
         }
     }
+
 
     LoginScreen(
         email = state.email,
@@ -70,7 +68,6 @@ private fun LoginScreen(
 ) {
     var showPass by remember { mutableStateOf(false) }
 
-
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
@@ -84,23 +81,27 @@ private fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Text(
-                    text = "Login",
-                    style = MaterialTheme.typography.headlineSmall
+                    text = "Iniciar Sesión",
+                    style = MaterialTheme.typography.headlineSmall,
+                    textAlign = TextAlign.Center
                 )
                 Spacer(Modifier.height(20.dp))
 
-                // --- FORMULARIO
                 OutlinedTextField(
                     value = email,
                     onValueChange = onEmailChange,
-                    label = { Text("Email") },
+                    label = { Text("Correo electrónico") },
                     singleLine = true,
                     isError = emailError != null,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                     modifier = Modifier.fillMaxWidth()
                 )
                 if (emailError != null) {
-                    Text(emailError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        emailError,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
 
                 Spacer(Modifier.height(8.dp))
@@ -123,7 +124,11 @@ private fun LoginScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
                 if (passError != null) {
-                    Text(passError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+                    Text(
+                        passError,
+                        color = MaterialTheme.colorScheme.error,
+                        style = MaterialTheme.typography.labelSmall
+                    )
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -149,7 +154,10 @@ private fun LoginScreen(
 
                 Spacer(Modifier.height(12.dp))
 
-                OutlinedButton(onClick = onGoRegister, modifier = Modifier.fillMaxWidth()) {
+                OutlinedButton(
+                    onClick = onGoRegister,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
                     Text("Crear cuenta")
                 }
             }
