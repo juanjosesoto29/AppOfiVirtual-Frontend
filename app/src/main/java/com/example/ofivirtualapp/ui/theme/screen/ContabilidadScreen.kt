@@ -23,7 +23,7 @@ fun ContabilidadScreen(
     val servicios = remember {
         listOf(
             // Mensual
-            ServicioConta(CategoriaConta.MENSUAL, "Contabilidad Mensual", "Registro, cierre y declaraciones periódicas.", 80_000),
+            ServicioConta(CategoriaConta.MENSUAL, "Contabilidad Mensual", "Registro, cierre y declaraciones periódicas.", 40_000),
             ServicioConta(CategoriaConta.MENSUAL, "Asesoría Tributaria Mensual", "Plan de asesoría y revisión de cumplimiento.", 50_000),
 
             // Rentas

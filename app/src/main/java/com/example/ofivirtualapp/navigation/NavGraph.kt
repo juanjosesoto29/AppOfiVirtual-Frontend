@@ -191,17 +191,21 @@ fun AppNavGraph(
             }
 
             composable(Route.OficinaVirtual.path) {
-                OficinaVirtualScreen(onAddToCart = { planOV ->
-                    val servicio = ServicioUI(
-                        categoria = CategoriaServicio.OFICINA_VIRTUAL,
-                        nombre = planOV.nombre,
-                        descripcion = "Plan de ${planOV.duracionMeses} meses. " + planOV.bullets.joinToString(" "),
-                        precioCLP = planOV.precioCLP
-                    )
-                    cartViewModel.addItem(servicio)
-                    Toast.makeText(context, "${servicio.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
-                })
+                OficinaVirtualScreenVm(
+                    onAddToCart = { planOV ->
+                        val servicio = ServicioUI(
+                            categoria = CategoriaServicio.OFICINA_VIRTUAL,
+                            nombre = planOV.nombre,
+                            descripcion = "Plan de ${planOV.duracionMeses} meses. " + planOV.bullets.joinToString(" "),
+                            precioCLP = planOV.precioCLP
+                        )
+                        cartViewModel.addItem(servicio)
+                        Toast.makeText(context, "${servicio.nombre} agregado al carrito", Toast.LENGTH_SHORT).show()
+                    },
+                    onBack = { navController.popBackStack() }
+                )
             }
+
             composable(Route.Contabilidad.path) {
                 ContabilidadScreen(onAddToCart = { servicioConta ->
                     val servicio = ServicioUI(

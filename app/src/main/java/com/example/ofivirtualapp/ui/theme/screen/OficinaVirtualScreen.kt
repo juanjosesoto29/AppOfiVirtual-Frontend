@@ -4,42 +4,92 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ofivirtualapp.viewmodel.OficinaVirtualUiState
+import com.example.ofivirtualapp.viewmodel.OficinaVirtualViewModel
 
+// 🔹 Wrapper que conecta la UI con el ViewModel y el backend
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun OficinaVirtualScreenVm(
+    onAddToCart: (PlanOV) -> Unit,
+    onBack: () -> Unit = {}
+) {
+    val vm: OficinaVirtualViewModel = viewModel()
+    val state by vm.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        vm.loadPlanes()
+    }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Oficina Virtual") },
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Volver")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+        ) {
+            when {
+                state.isLoading -> {
+                    CircularProgressIndicator(Modifier.align(Alignment.Center))
+                }
+                state.errorMsg != null -> {
+                    Column(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .padding(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Text(
+                            text = state.errorMsg ?: "Error desconocido",
+                            color = MaterialTheme.colorScheme.error
+                        )
+                        Spacer(Modifier.height(8.dp))
+                        Button(onClick = { vm.loadPlanes() }) {
+                            Text("Reintentar")
+                        }
+                    }
+                }
+                else -> {
+                    OficinaVirtualScreen(
+                        planes = state.planes,
+                        onAddToCart = onAddToCart
+                    )
+                }
+            }
+        }
+    }
+}
+
+// 🔹 Tu pantalla original, ahora recibe los planes por parámetro
 @Composable
 fun OficinaVirtualScreen(
+    planes: List<PlanOV>,
     onAddToCart: (PlanOV) -> Unit = {}
 ) {
     val OfiBlue = Color(0xFF071290)
-
-    val planes = listOf(
-        PlanOV(
-            nombre = "Plan Semestral",
-            precioCLP = 86_000,
-            duracionMeses = 6,
-            bullets = listOf(
-                "Incluye domicilio tributario.",
-                "Recepción de correspondencia."
-            )
-        ),
-        PlanOV(
-            nombre = "Plan Anual",
-            precioCLP = 126_000,
-            duracionMeses = 12,
-            bullets = listOf(
-                "Incluye domicilio tributario.",
-                "Recepción de correspondencia.",
-                "Precio más conveniente."
-            )
-        )
-    )
 
     Column(
         modifier = Modifier
@@ -66,7 +116,7 @@ fun OficinaVirtualScreen(
     }
 }
 
-
+// 🔹 Modelo UI tal como lo tenías
 data class PlanOV(
     val nombre: String,
     val precioCLP: Int,
@@ -128,7 +178,6 @@ private fun PlanOVCard(
         }
     }
 }
-
 
 private fun Int.toCLP(): String {
     if (this == 0) return "$0"
