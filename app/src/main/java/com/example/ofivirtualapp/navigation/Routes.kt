@@ -9,6 +9,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 
 sealed class Route(val path: String) {
+    object Splash : Route("splash")
     object Onboarding : Route("onboarding")
 
     object Login : Route("login")

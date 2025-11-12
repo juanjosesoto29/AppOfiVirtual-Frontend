@@ -47,6 +47,7 @@ fun AppNavGraph(
 
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
+    val cartCount by cartViewModel.cartCount
 
     val goTo: (String) -> Unit = { route -> navController.navigate(route) }
     val goHome: () -> Unit = { navController.navigate(Route.Home.path) }
@@ -69,15 +70,32 @@ fun AppNavGraph(
             val currentRoute = navBackStackEntry?.destination?.route
             val screensWithBottomNav = listOf(Route.Home.path, Route.Servicios.path, Route.Carrito.path, Route.Perfil.path)
             if (currentRoute in screensWithBottomNav) {
-                BottomNavBar(navController = navController)
+                BottomNavBar(
+                    navController = navController,
+                    cartCount = cartCount,  // 🔹 se actualiza automáticamente
+                    profileDot = false    // 👈 si quieres mostrar el puntito rojo en el perfil
+                )
+
             }
         }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Route.Onboarding.path,
+            startDestination = Route.Splash.path,
             modifier = Modifier.padding(innerPadding)
         ) {
+
+            composable(Route.Splash.path) {
+                SplashScreen(
+                    onFinished = {
+                        navController.navigate(Route.Onboarding.path) {
+                            popUpTo(Route.Splash.path) { inclusive = true }
+                            launchSingleTop = true
+                        }
+                    }
+                )
+            }
+
             composable(Route.Onboarding.path) {
                 OnboardingScreen(
                     onLogin = goLogin,

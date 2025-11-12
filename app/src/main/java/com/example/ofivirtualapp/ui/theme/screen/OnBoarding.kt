@@ -23,6 +23,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ofivirtualapp.R
+import com.example.ofivirtualapp.ui.theme.Gold
+import com.example.ofivirtualapp.ui.theme.OfiBlue
 
 @Composable
 fun OnboardingScreen(
@@ -30,135 +32,160 @@ fun OnboardingScreen(
     onRegister: () -> Unit,
     onSkip: () -> Unit
 ) {
-    val OfiBlue = Color(0xFF071290)
-
     var start by remember { mutableStateOf(false) }
     LaunchedEffect(Unit) { start = true }
+
+    // Degradado azul limpio (dos tonos)
+    val bg = Brush.verticalGradient(
+        listOf(
+            Color(0xFF0A1BA6),
+            Color(0xFF1426D3)
+        )
+    )
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(OfiBlue)
-            .padding(horizontal = 24.dp, vertical = 32.dp),
+            .background(bg)
+            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+            .navigationBarsPadding()
+            .padding(horizontal = 22.dp),
         contentAlignment = Alignment.Center
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            // LOGO
-            AnimatedVisibility(
-                visible = start,
-                enter = fadeIn(animationSpec = tween(450)) +
-                        slideInVertically(initialOffsetY = { it / 4 }, animationSpec = tween(450))
+        // Layout sin scroll: usamos pesos y tamaños adaptativos
+        BoxWithConstraints(Modifier.fillMaxSize()) {
+            val h = maxHeight
+            val logoSize = if (h < 640.dp) 120.dp else 160.dp       // se ajusta en pantallas pequeñas
+            val cardPadV = if (h < 640.dp) 14.dp else 18.dp
+            val cardRadius = 22.dp
+
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Image(
-                    painter = painterResource(id = R.drawable.ofivirtual_logo),
-                    contentDescription = "Logo OfiVirtual",
-                    modifier = Modifier
-                        .size(200.dp)
-                        .padding(bottom = 10.dp),
-                    contentScale = ContentScale.Fit
-                )
-            }
+                Spacer(Modifier.height(16.dp))
 
-            // TÍTULO
-            AnimatedVisibility(
-                visible = start,
-                enter = fadeIn(animationSpec = tween(500, delayMillis = 120)) +
-                        slideInVertically(initialOffsetY = { it / 5 }, animationSpec = tween(500, delayMillis = 120))
-            ) {
-                Text(
-                    text = "Bienvenido a OfiVirtual",
-                    color = Color.White,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
-                )
-            }
+                // Logo + marca
+                AnimatedVisibility(
+                    visible = start,
+                    enter = fadeIn(tween(420)) +
+                            slideInVertically(initialOffsetY = { it / 6 }, animationSpec = tween(420))
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Image(
+                            painter = painterResource(id = R.drawable.ofivirtual_logo),
+                            contentDescription = "Logo OfiVirtual",
+                            modifier = Modifier
+                                .size(200.dp)
+                                .padding(bottom = 8.dp),
+                            contentScale = ContentScale.Fit
+                        )
 
-            Spacer(Modifier.height(8.dp))
+                    }
+                }
 
-            // SUBTÍTULO
-            AnimatedVisibility(
-                visible = start,
-                enter = fadeIn(animationSpec = tween(500, delayMillis = 220)) +
-                        slideInVertically(initialOffsetY = { it / 6 }, animationSpec = tween(500, delayMillis = 220))
-            ) {
-                Text(
-                    text = "Tu oficina virtual, contabilidad y formalización en un solo lugar.",
-                    color = Color.White.copy(alpha = 0.85f),
-                    fontSize = 16.sp,
-                    textAlign = TextAlign.Center
-                )
-            }
+                Spacer(Modifier.height(if (h < 640.dp) 12.dp else 18.dp))
 
-            Spacer(Modifier.height(40.dp))
+                // Tarjeta de texto (glass muy sutil)
+                AnimatedVisibility(
+                    visible = start,
+                    enter = fadeIn(tween(500, delayMillis = 120)) +
+                            slideInVertically(initialOffsetY = { it / 7 }, animationSpec = tween(500, delayMillis = 120))
+                ) {
+                    Surface(
+                        color = Color.White.copy(alpha = 0.10f),
+                        shape = RoundedCornerShape(cardRadius),
+                        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.12f))
+                    ) {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 20.dp, vertical = cardPadV),
+                            horizontalAlignment = Alignment.CenterHorizontally
+                        ) {
+                            Text(
+                                text = "Bienvenido a OfiVirtual",
+                                style = MaterialTheme.typography.headlineLarge,
+                                color = Color.White,
+                                fontWeight = FontWeight.SemiBold,
+                                textAlign = TextAlign.Center
+                            )
+                            Spacer(Modifier.height(8.dp))
+                            Text(
+                                text = "Tu oficina virtual, contabilidad y formalización en un solo lugar.",
+                                style = MaterialTheme.typography.bodyLarge,
+                                color = Color.White.copy(alpha = 0.92f),
+                                textAlign = TextAlign.Center
+                            )
+                        }
+                    }
+                }
 
+                // Empuja el bloque de botones hacia abajo pero sin salir de pantalla
+                Spacer(Modifier.weight(1f))
 
-            AnimatedVisibility(
-                visible = start,
-                enter = fadeIn(animationSpec = tween(500, delayMillis = 320)) +
-                        slideInVertically(initialOffsetY = { it / 6 }, animationSpec = tween(500, delayMillis = 320))
-            ) {
-                val gradient = Brush.horizontalGradient(
-                    listOf(Color.White, Color(0xFFF2F5FF)) // blanco -> blanco azulado suave
-                )
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(gradient),
-                    contentAlignment = Alignment.Center
+                // Botón principal: relleno de un solo color (dorado corporativo)
+                AnimatedVisibility(
+                    visible = start,
+                    enter = fadeIn(tween(500, delayMillis = 240)) +
+                            slideInVertically(initialOffsetY = { it / 8 }, animationSpec = tween(500, delayMillis = 240))
                 ) {
                     Button(
                         onClick = onRegister,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        shape = RoundedCornerShape(16.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color.Transparent,
-                            contentColor = OfiBlue
+                            containerColor = Gold,          // ✅ sólido
+                            contentColor = Color.White
                         ),
-                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 6.dp),
-                        modifier = Modifier.fillMaxSize()
+                        elevation = ButtonDefaults.buttonElevation(defaultElevation = 2.dp)
                     ) {
-                        Text("Comenzar", fontSize = 16.sp, fontWeight = FontWeight.Medium)
+                        Text("Comenzar", style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp))
                     }
                 }
-            }
 
-            Spacer(Modifier.height(12.dp))
+                Spacer(Modifier.height(12.dp))
 
-            AnimatedVisibility(
-                visible = start,
-                enter = fadeIn(animationSpec = tween(500, delayMillis = 420)) +
-                        slideInVertically(initialOffsetY = { it / 8 }, animationSpec = tween(500, delayMillis = 420))
-            ) {
-                OutlinedButton(
-                    onClick = onLogin,
-                    colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
-                    border = BorderStroke(1.dp, Color.White),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(52.dp)
+                // Botón secundario (outline suave, radio grande)
+                AnimatedVisibility(
+                    visible = start,
+                    enter = fadeIn(tween(500, delayMillis = 320)) +
+                            slideInVertically(initialOffsetY = { it / 10 }, animationSpec = tween(500, delayMillis = 320))
                 ) {
-                    Text("Ya tengo cuenta", fontSize = 16.sp)
+                    OutlinedButton(
+                        onClick = onLogin,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(54.dp),
+                        shape = RoundedCornerShape(16.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White),
+                        border = BorderStroke(1.2.dp, Color.White.copy(alpha = 0.95f))
+                    ) {
+                        Text("Ya tengo cuenta", style = MaterialTheme.typography.labelLarge.copy(fontSize = 16.sp))
+                    }
                 }
-            }
 
-            Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height(10.dp))
 
-            AnimatedVisibility(
-                visible = start,
-                enter = fadeIn(animationSpec = tween(500, delayMillis = 480)) +
-                        slideInVertically(initialOffsetY = { it / 10 }, animationSpec = tween(500, delayMillis = 480))
-            ) {
-                TextButton(onClick = onSkip) {
-                    Text(
-                        "Entrar como invitado",
-                        color = Color.White.copy(alpha = 0.85f),
-                        fontSize = 14.sp
-                    )
+                // Link invitado (siempre visible por el padding de barras de navegación)
+                AnimatedVisibility(
+                    visible = start,
+                    enter = fadeIn(tween(500, delayMillis = 380)) +
+                            slideInVertically(initialOffsetY = { it / 12 }, animationSpec = tween(500, delayMillis = 380))
+                ) {
+                    TextButton(onClick = onSkip) {
+                        Text(
+                            "Entrar como invitado",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.White.copy(alpha = 0.88f)
+                        )
+                    }
                 }
+
+                Spacer(Modifier.height(if (h < 640.dp) 8.dp else 14.dp))
             }
         }
     }

@@ -22,6 +22,10 @@ class CartViewModel : ViewModel() {
         _uiState.value.items.sumOf { it.precioCLP } //  3. SUMAMOS LOS PRECIOS DE ServicioUI
     }
 
+    val cartCount: State<Int> = derivedStateOf {
+        _uiState.value.items.size
+    }
+
     /**
      * Agrega un nuevo servicio al carrito.
      */
