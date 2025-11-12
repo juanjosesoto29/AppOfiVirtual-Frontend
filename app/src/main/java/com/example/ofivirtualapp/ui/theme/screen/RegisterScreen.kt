@@ -1,7 +1,10 @@
 package com.example.ofivirtualapp.ui.theme.screen
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
@@ -9,10 +12,15 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ofivirtualapp.viewmodel.AuthViewModel
 
@@ -82,129 +90,190 @@ private fun RegisterScreen(
     var showPass by remember { mutableStateOf(false) }
     var showConfirm by remember { mutableStateOf(false) }
 
+    val ofiBlue = Color(0xFF071290)
+    val gold = Color(0xFFDAA520)
+
     Scaffold { innerPadding ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
+                .background(
+                    Brush.verticalGradient(
+                        listOf(ofiBlue.copy(alpha = 0.95f), Color(0xFFF5F7FF))
+                    )
+                )
                 .padding(innerPadding)
-                .padding(16.dp),
+                .padding(horizontal = 24.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
+                shape = RoundedCornerShape(24.dp),
+                elevation = CardDefaults.cardElevation(8.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White)
             ) {
-                Text("Crear cuenta", style = MaterialTheme.typography.headlineSmall)
-                Spacer(Modifier.height(20.dp))
-
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = onNameChange,
-                    label = { Text("Nombre completo") },
-                    singleLine = true,
-                    isError = nameError != null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (nameError != null)
-                    Text(nameError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-
-                Spacer(Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = email,
-                    onValueChange = onEmailChange,
-                    label = { Text("Correo electrónico") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
-                    isError = emailError != null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (emailError != null)
-                    Text(emailError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-
-                Spacer(Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = phone,
-                    onValueChange = onPhoneChange,
-                    label = { Text("Teléfono") },
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-                    isError = phoneError != null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (phoneError != null)
-                    Text(phoneError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-
-                Spacer(Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = pass,
-                    onValueChange = onPassChange,
-                    label = { Text("Contraseña") },
-                    singleLine = true,
-                    visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = { showPass = !showPass }) {
-                            Icon(
-                                imageVector = if (showPass) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                contentDescription = if (showPass) "Ocultar contraseña" else "Mostrar contraseña"
-                            )
-                        }
-                    },
-                    isError = passError != null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (passError != null)
-                    Text(passError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-
-                Spacer(Modifier.height(8.dp))
-
-                OutlinedTextField(
-                    value = confirm,
-                    onValueChange = onConfirmChange,
-                    label = { Text("Confirmar contraseña") },
-                    singleLine = true,
-                    visualTransformation = if (showConfirm) VisualTransformation.None else PasswordVisualTransformation(),
-                    trailingIcon = {
-                        IconButton(onClick = { showConfirm = !showConfirm }) {
-                            Icon(
-                                imageVector = if (showConfirm) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
-                                contentDescription = if (showConfirm) "Ocultar contraseña" else "Mostrar contraseña"
-                            )
-                        }
-                    },
-                    isError = confirmError != null,
-                    modifier = Modifier.fillMaxWidth()
-                )
-                if (confirmError != null)
-                    Text(confirmError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
-
-                Spacer(Modifier.height(16.dp))
-
-                Button(
-                    onClick = onSubmit,
-                    enabled = canSubmit && !isSubmitting,
-                    modifier = Modifier.fillMaxWidth()
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp, vertical = 28.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    if (isSubmitting) {
-                        CircularProgressIndicator(strokeWidth = 2.dp, modifier = Modifier.size(18.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("Creando cuenta...")
-                    } else {
-                        Text("Registrarme")
+                    Text(
+                        text = "Crear cuenta",
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.Bold,
+                            color = ofiBlue
+                        ),
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(Modifier.height(20.dp))
+
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = onNameChange,
+                        label = { Text("Nombre completo") },
+                        singleLine = true,
+                        isError = nameError != null,
+                        modifier = Modifier
+                            .fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    if (nameError != null)
+                        Text(nameError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+
+                    Spacer(Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = onEmailChange,
+                        label = { Text("Correo electrónico") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
+                        isError = emailError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    if (emailError != null)
+                        Text(emailError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+
+                    Spacer(Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = phone,
+                        onValueChange = onPhoneChange,
+                        label = { Text("Teléfono") },
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                        isError = phoneError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    if (phoneError != null)
+                        Text(phoneError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+
+                    Spacer(Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = pass,
+                        onValueChange = onPassChange,
+                        label = { Text("Contraseña") },
+                        singleLine = true,
+                        visualTransformation = if (showPass) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { showPass = !showPass }) {
+                                Icon(
+                                    imageVector = if (showPass) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                    contentDescription = if (showPass) "Ocultar contraseña" else "Mostrar contraseña",
+                                    tint = ofiBlue
+                                )
+                            }
+                        },
+                        isError = passError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    if (passError != null)
+                        Text(passError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+
+                    Spacer(Modifier.height(10.dp))
+
+                    OutlinedTextField(
+                        value = confirm,
+                        onValueChange = onConfirmChange,
+                        label = { Text("Confirmar contraseña") },
+                        singleLine = true,
+                        visualTransformation = if (showConfirm) VisualTransformation.None else PasswordVisualTransformation(),
+                        trailingIcon = {
+                            IconButton(onClick = { showConfirm = !showConfirm }) {
+                                Icon(
+                                    imageVector = if (showConfirm) Icons.Filled.VisibilityOff else Icons.Filled.Visibility,
+                                    contentDescription = if (showConfirm) "Ocultar contraseña" else "Mostrar contraseña",
+                                    tint = ofiBlue
+                                )
+                            }
+                        },
+                        isError = confirmError != null,
+                        modifier = Modifier.fillMaxWidth(),
+                        shape = RoundedCornerShape(12.dp)
+                    )
+                    if (confirmError != null)
+                        Text(confirmError, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.labelSmall)
+
+                    Spacer(Modifier.height(22.dp))
+
+                    Button(
+                        onClick = onSubmit,
+                        enabled = canSubmit && !isSubmitting,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(52.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.buttonColors(containerColor = gold)
+                    ) {
+                        if (isSubmitting) {
+                            CircularProgressIndicator(
+                                strokeWidth = 2.dp,
+                                modifier = Modifier.size(18.dp),
+                                color = Color.White
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text("Creando cuenta...", color = Color.White)
+                        } else {
+                            Text("Registrarme", color = Color.White)
+                        }
                     }
-                }
 
-                if (errorMsg != null) {
+                    if (errorMsg != null) {
+                        Spacer(Modifier.height(10.dp))
+                        Text(errorMsg, color = MaterialTheme.colorScheme.error)
+                    }
+
+                    Spacer(Modifier.height(18.dp))
+
+                    OutlinedButton(
+                        onClick = onGoLogin,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(50.dp),
+                        shape = RoundedCornerShape(14.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = ofiBlue
+                        ),
+                        border = BorderStroke(1.3.dp, ofiBlue)
+                    ) {
+                        Text("Ya tengo una cuenta", fontWeight = FontWeight.Medium)
+                    }
+
                     Spacer(Modifier.height(8.dp))
-                    Text(errorMsg, color = MaterialTheme.colorScheme.error)
-                }
-
-                Spacer(Modifier.height(12.dp))
-
-                OutlinedButton(onClick = onGoLogin, modifier = Modifier.fillMaxWidth()) {
-                    Text("Ya tengo una cuenta")
+                    Text(
+                        text = "Al registrarte, aceptas nuestros Términos y Condiciones.",
+                        fontSize = 12.sp,
+                        color = ofiBlue.copy(alpha = 0.7f),
+                        textAlign = TextAlign.Center
+                    )
                 }
             }
         }
