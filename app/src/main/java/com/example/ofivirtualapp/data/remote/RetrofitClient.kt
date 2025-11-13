@@ -14,6 +14,8 @@ object RetrofitClient {
     // 🔹 BACKEND PLANES / SUSCRIPCIONES
     private const val BASE_URL_PLANES = "http://10.155.85.185:8085/"
 
+    private const val BASE_URL_SOPORTE = "http://10.155.85.185:8086/"
+
     // Logging para ver las peticiones/respuestas en Logcat
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
@@ -49,5 +51,9 @@ object RetrofitClient {
     // ✅ API de Planes / Suscripciones (8085)
     val planApi: PlanApi by lazy {
         buildRetrofit(BASE_URL_PLANES).create(PlanApi::class.java)
+    }
+
+    val ticketApi: TicketApi by lazy {
+        buildRetrofit(BASE_URL_SOPORTE).create(TicketApi::class.java)
     }
 }

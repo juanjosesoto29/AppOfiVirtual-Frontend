@@ -1,152 +1,271 @@
 package com.example.ofivirtualapp.ui.theme.screen
 
-import android.content.Intent
-import android.net.Uri
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.outlined.*
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.example.ofivirtualapp.navigation.Route
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.ofivirtualapp.data.remote.ticket.TicketResponse
+import com.example.ofivirtualapp.viewmodel.TicketViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+// VM wrapper
 @Composable
-fun SoporteScreen(
+fun SoporteScreenVm(
+    vm: TicketViewModel,
     onNavigateBack: () -> Unit,
     onGoToFaq: () -> Unit
 ) {
-    val context = LocalContext.current
+    val state by vm.uiState.collectAsStateWithLifecycle()
 
-    val whatsappNumber = "+56928532988"
-    val supportEmail = "soporte@ofivirtual.cl"
+    // Cargar tickets al entrar
+    LaunchedEffect(Unit) {
+        vm.loadTickets()
+    }
+
+    SoporteScreen(
+        isLoading = state.isLoading,
+        tickets = state.tickets,
+        errorMsg = state.errorMsg,
+        successMsg = state.successMsg,
+        onCreateTicket = { asunto, descripcion ->
+            // TODO: reemplazar 1L por el userId real cuando lo tengas
+            vm.createTicket(
+                userId = 1L,
+                empresaId = null,
+                asunto = asunto,
+                descripcion = descripcion
+            )
+        },
+        onDeleteTicket = { vm.deleteTicket(it) },
+        onClearMessages = { vm.clearMessages() },
+        onNavigateBack = onNavigateBack,
+        onGoToFaq = onGoToFaq
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun SoporteScreen(
+    isLoading: Boolean,
+    tickets: List<TicketResponse>,
+    errorMsg: String?,
+    successMsg: String?,
+    onCreateTicket: (String, String) -> Unit,
+    onDeleteTicket: (Long) -> Unit,
+    onClearMessages: () -> Unit,
+    onNavigateBack: () -> Unit,
+    onGoToFaq: () -> Unit
+) {
+    var asunto by remember { mutableStateOf("") }
+    var descripcion by remember { mutableStateOf("") }
+
+    val isFormValid = asunto.isNotBlank() && descripcion.isNotBlank()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Ayuda y Soporte", fontWeight = FontWeight.SemiBold) },
+                title = { Text("Soporte y Tickets") },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, "Volver")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Volver")
+                    }
+                },
+                actions = {
+                    IconButton(onClick = onGoToFaq) {
+                        Icon(Icons.Filled.HelpOutline, contentDescription = "Preguntas frecuentes")
                     }
                 }
             )
         }
     ) { innerPadding ->
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(innerPadding)
-                .verticalScroll(rememberScrollState())
-                .padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+                .padding(16.dp)
         ) {
-            Text(
-                "¿Necesitas ayuda? Elige una de las siguientes opciones para resolver tus dudas o contactarnos directamente.",
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
 
-            SupportSection(title = "Auto-ayuda") {
-                SupportItem(
-                    icon = Icons.Outlined.Quiz,
-                    title = "Preguntas Frecuentes (FAQ)",
-                    subtitle = "Encuentra respuestas a las dudas más comunes.",
-                    onClick = onGoToFaq
+            // Mensajes de error/éxito
+            if (errorMsg != null) {
+                AssistChip(
+                    onClick = onClearMessages,
+                    label = { Text(errorMsg) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        labelColor = MaterialTheme.colorScheme.error,
+                        containerColor = MaterialTheme.colorScheme.errorContainer
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
+                Spacer(Modifier.height(12.dp))
+            } else if (successMsg != null) {
+                AssistChip(
+                    onClick = onClearMessages,
+                    label = { Text(successMsg) },
+                    colors = AssistChipDefaults.assistChipColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(Modifier.height(12.dp))
             }
 
-            SupportSection(title = "Contacto Directo") {
-                SupportItem(
-                    icon = Icons.Outlined.Call,
-                    title = "WhatsApp",
-                    subtitle = "Inicia un chat con un agente de soporte.",
-                    onClick = { openUrl(context, "https://wa.me/$whatsappNumber") }
-                )
-                Divider(Modifier.padding(horizontal = 16.dp))
-                SupportItem(
-                    icon = Icons.Outlined.AlternateEmail,
-                    title = "Correo Electrónico",
-                    subtitle = "Envíanos tu consulta por email.",
-                    onClick = { sendEmail(context, supportEmail, "Consulta desde la App OfiVirtual") }
-                )
+            // Formulario para nuevo ticket
+            Text(
+                text = "Crear nuevo ticket",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+            )
+            Spacer(Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = asunto,
+                onValueChange = { asunto = it },
+                label = { Text("Asunto") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            OutlinedTextField(
+                value = descripcion,
+                onValueChange = { descripcion = it },
+                label = { Text("Descripción del problema") },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(min = 100.dp),
+                maxLines = 5
+            )
+
+            Spacer(Modifier.height(8.dp))
+
+            Button(
+                onClick = {
+                    onCreateTicket(asunto.trim(), descripcion.trim())
+                    asunto = ""
+                    descripcion = ""
+                },
+                enabled = isFormValid && !isLoading,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                if (isLoading) {
+                    CircularProgressIndicator(
+                        strokeWidth = 2.dp,
+                        modifier = Modifier
+                            .size(18.dp)
+                            .padding(end = 8.dp)
+                    )
+                    Text("Enviando...")
+                } else {
+                    Text("Enviar ticket")
+                }
+            }
+
+            Spacer(Modifier.height(24.dp))
+
+            Text(
+                text = "Mis tickets",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+            )
+            Spacer(Modifier.height(8.dp))
+
+            if (isLoading && tickets.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (tickets.isEmpty()) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        "Aún no has enviado tickets de soporte.",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+            } else {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                ) {
+                    items(tickets) { ticket ->
+                        TicketCard(
+                            ticket = ticket,
+                            onDelete = { onDeleteTicket(ticket.id) }
+                        )
+                        Spacer(Modifier.height(8.dp))
+                    }
+                }
             }
         }
     }
 }
 
-
 @Composable
-private fun SupportSection(
-    title: String,
-    content: @Composable ColumnScope.() -> Unit
+private fun TicketCard(
+    ticket: TicketResponse,
+    onDelete: () -> Unit
 ) {
     Card(
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        modifier = Modifier.fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Column(Modifier.fillMaxWidth()) {
+        Column(modifier = Modifier.padding(12.dp)) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = ticket.asunto,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
+                    modifier = Modifier.weight(1f),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+                IconButton(onClick = onDelete) {
+                    Icon(Icons.Filled.Delete, contentDescription = "Eliminar ticket")
+                }
+            }
+
             Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.SemiBold,
-                modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 4.dp)
+                text = "Estado: ${ticket.estado}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.primary
             )
-            content()
+
+            Spacer(Modifier.height(4.dp))
+
+            Text(
+                text = ticket.descripcion,
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 3,
+                overflow = TextOverflow.Ellipsis
+            )
+
+            Spacer(Modifier.height(4.dp))
+
+            Text(
+                text = "Creado: ${ticket.fechaCreacion}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
-    }
-}
-
-@Composable
-private fun SupportItem(
-    icon: ImageVector,
-    title: String,
-    subtitle: String,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onClick() }
-            .padding(16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Icon(icon, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
-        Spacer(Modifier.width(16.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
-            Text(subtitle, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
-        }
-        Icon(Icons.Outlined.ChevronRight, contentDescription = null, tint = MaterialTheme.colorScheme.onSurfaceVariant)
-    }
-}
-
-
-private fun openUrl(context: android.content.Context, url: String) {
-    runCatching {
-        context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
-    }
-}
-
-private fun sendEmail(context: android.content.Context, to: String, subject: String) {
-    val intent = Intent(Intent.ACTION_SENDTO).apply {
-        data = Uri.parse("mailto:")
-        putExtra(Intent.EXTRA_EMAIL, arrayOf(to))
-        putExtra(Intent.EXTRA_SUBJECT, subject)
-    }
-    runCatching {
-        context.startActivity(intent)
     }
 }

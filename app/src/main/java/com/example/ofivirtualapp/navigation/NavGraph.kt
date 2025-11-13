@@ -35,6 +35,7 @@ import com.example.ofivirtualapp.viewmodel.AuthViewModel
 import com.example.ofivirtualapp.viewmodel.CartViewModel
 import com.example.ofivirtualapp.viewmodel.PerfilViewModel
 import com.example.ofivirtualapp.viewmodel.EmpresaViewModel
+import com.example.ofivirtualapp.viewmodel.TicketViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.runtime.LaunchedEffect
@@ -48,6 +49,7 @@ fun AppNavGraph(
 
     val navController = rememberNavController()
     val cartViewModel: CartViewModel = viewModel()
+    val ticketViewModel: TicketViewModel = viewModel()
     val cartCount by cartViewModel.cartCount
 
     val goTo: (String) -> Unit = { route -> navController.navigate(route) }
@@ -278,11 +280,13 @@ fun AppNavGraph(
             }
             composable(Route.FAQ.path) { FaqScreen(onNavigateBack = { navController.popBackStack() }) }
             composable(Route.Soporte.path) {
-                SoporteScreen(
+                SoporteScreenVm(
+                    vm = ticketViewModel,
                     onNavigateBack = { navController.popBackStack() },
                     onGoToFaq = { goTo(Route.FAQ.path) }
                 )
             }
+
             composable(Route.AcercaDe.path) { AcercaDeScreen(onNavigateBack = { navController.popBackStack() }) }
             composable(
                 route = Route.Checkout.path,
