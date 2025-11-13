@@ -9,10 +9,10 @@ object RetrofitClient {
 
     // 🔹 BACKEND AUTH / USUARIOS / EMPRESA
     // (ajusta la IP según tu PC en la red)
-    private const val BASE_URL_USERS = "http://192.168.1.109:8082/"
-
+    // private const val BASE_URL_USERS = "http://192.168.1.109:8082/"
+    private const val BASE_URL_USERS = "http://10.155.85.185:8082/"
     // 🔹 BACKEND PLANES / SUSCRIPCIONES
-    private const val BASE_URL_PLANES = "http://192.168.1.109:8085/"
+    private const val BASE_URL_PLANES = "http://10.155.85.185:8085/"
 
     // Logging para ver las peticiones/respuestas en Logcat
     private val logging = HttpLoggingInterceptor().apply {

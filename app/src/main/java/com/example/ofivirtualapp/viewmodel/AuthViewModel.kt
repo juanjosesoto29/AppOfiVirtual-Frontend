@@ -63,6 +63,24 @@ class AuthViewModel : ViewModel() {
     private val _register = MutableStateFlow(RegisterUiState())
     val register: StateFlow<RegisterUiState> = _register.asStateFlow()
 
+
+    //------LIAMPIA LOS CAMPOS ----
+    /** Limpia TODO: campos y errores del login */
+    fun resetLoginForm() {
+        _login.value = LoginUiState()
+    }
+
+    /** Limpia TODO: campos y errores del registro */
+    fun resetRegisterForm() {
+        _register.value = RegisterUiState()
+    }
+
+    /** Para usar al cerrar sesión: limpia todo Auth */
+    fun resetAuthForms() {
+        resetLoginForm()
+        resetRegisterForm()
+    }
+
     // ============================================================
     // LOGIN: HANDLERS DE CAMBIO DE CAMPOS
     // ============================================================

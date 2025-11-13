@@ -37,6 +37,7 @@ import com.example.ofivirtualapp.viewmodel.PerfilViewModel
 import com.example.ofivirtualapp.viewmodel.EmpresaViewModel
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.runtime.LaunchedEffect
 
 @Composable
 fun AppNavGraph(
@@ -109,6 +110,7 @@ fun AppNavGraph(
                     onLogout = {
                         scope.launch {
                             userPrefs.clearSession()
+                            authViewModel.resetAuthForms()
                             navigateAndClearStack(Route.Onboarding.path)
                         }
                     },
@@ -133,6 +135,9 @@ fun AppNavGraph(
                 )
             }
             composable(Route.Login.path) {
+                LaunchedEffect(Unit) {
+                    authViewModel.resetLoginForm()
+                }
                 LoginScreenVm(
                     vm = authViewModel,
                     userPrefs = userPrefs,
@@ -141,6 +146,9 @@ fun AppNavGraph(
                 )
             }
             composable(Route.Register.path) {
+                LaunchedEffect(Unit) {
+                    authViewModel.resetRegisterForm()
+                }
                 RegisterScreenVm(
                     vm = authViewModel,
                     onRegisteredNavigateLogin = goLogin,

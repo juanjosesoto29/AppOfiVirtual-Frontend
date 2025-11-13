@@ -4,7 +4,8 @@
     <domain-config cleartextTrafficPermitted="true">
         <!-- 👇 Agrega aquí las IPs o dominios que uses -->
         <domain includeSubdomains="true">192.168.1.109</domain> <!-- tu PC -->
-        <domain includeSubdomains="true">10.0.2.2</domain>      <!-- emulador Android -->
+        <domain includeSubdomains="true">10.0.2.2</domain>
+        <domain includeSubdomains="true">10.155.85.185</domain> <!-- emulador Android -->
         <domain includeSubdomains="true">localhost</domain>
     </domain-config>
 </network-security-config>
