@@ -69,7 +69,7 @@ fun SoporteScreenVm(
 // ---------------------------
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
-private fun SoporteScreen(
+fun SoporteScreen(
     isLoading: Boolean,
     tickets: List<TicketResponse>,
     errorMsg: String?,

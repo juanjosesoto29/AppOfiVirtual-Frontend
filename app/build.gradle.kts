@@ -116,10 +116,17 @@ dependencies {
 
     //manipular la carga de imagenes en el cache temporal
     implementation("io.coil-kt:coil-compose:2.7.0")
-    
+
+    // --- Pruebas unitarias (lógica + corrutinas) ---
+    testImplementation("junit:junit:4.13.2")
+    testImplementation("io.mockk:mockk:1.13.13")
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.9.0")
+
+// --- Pruebas de UI con Compose ---
+    androidTestImplementation("androidx.compose.ui:ui-test-junit4:<compose_version>")
+    debugImplementation("androidx.compose.ui:ui-test-manifest:<compose_version>")
 
     // --- PRUEBAS (TESTING) ---
-    testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2024.02.01"))
