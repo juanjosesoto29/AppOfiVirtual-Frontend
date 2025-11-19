@@ -7,5 +7,7 @@
         <domain includeSubdomains="true">10.0.2.2</domain>
         <domain includeSubdomains="true">10.155.85.185</domain> <!-- emulador Android -->
         <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">192.168.100.21</domain>  <!-- oficina -->
+        <domain includeSubdomains="true">192.168.1.16</domain> <!-- casa fran -->
     </domain-config>
 </network-security-config>

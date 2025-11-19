@@ -3,113 +3,162 @@ package com.example.ofivirtualapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ofivirtualapp.data.remote.ticket.TicketRequest
-import com.example.ofivirtualapp.data.remote.ticket.TicketResponse
 import com.example.ofivirtualapp.data.repository.TicketRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-data class TicketUiState(
-    val isLoading: Boolean = false,
-    val tickets: List<TicketResponse> = emptyList(),
-    val errorMsg: String? = null,
-    val successMsg: String? = null
-)
-
 class TicketViewModel(
     private val repo: TicketRepository = TicketRepository()
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(TicketUiState())
-    val uiState: StateFlow<TicketUiState> = _uiState.asStateFlow()
+    private val _uiState = MutableStateFlow(SoporteUiState())
+    val uiState: StateFlow<SoporteUiState> = _uiState.asStateFlow()
 
+    // 🔹 Cargar todos los tickets (GET ALL)
     fun loadTickets() {
-        _uiState.value = _uiState.value.copy(isLoading = true, errorMsg = null, successMsg = null)
         viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                errorMsg = null,
+                successMsg = null
+            )
             try {
-                val response = repo.getAll()
-                if (response.isSuccessful) {
+                val resp = repo.getAll()
+                if (resp.isSuccessful) {
+                    val data = resp.body().orEmpty()
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        tickets = response.body() ?: emptyList()
+                        tickets = data
                     )
                 } else {
                     _uiState.value = _uiState.value.copy(
                         isLoading = false,
-                        errorMsg = "Error al cargar tickets (${response.code()})"
+                        errorMsg = "Error ${resp.code()}: ${resp.message()}"
                     )
                 }
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    errorMsg = "Error de conexión al cargar tickets"
+                    errorMsg = "Error al cargar tickets: ${e.message}"
                 )
             }
         }
     }
 
-    fun createTicket(userId: Long, empresaId: Long? = null, asunto: String, descripcion: String) {
-        _uiState.value = _uiState.value.copy(isLoading = true, errorMsg = null, successMsg = null)
+    // 🔹 Crear ticket (POST)
+    fun createTicket(
+        userId: Long,
+        empresaId: Long?,
+        asunto: String,
+        descripcion: String
+    ) {
+        viewModelScope.launch {
+            _uiState.value = _uiState.value.copy(
+                isLoading = true,
+                errorMsg = null,
+                successMsg = null
+            )
+            try {
+                val req = TicketRequest(
+                    userId = userId,
+                    empresaId = empresaId,
+                    asunto = asunto,
+                    descripcion = descripcion
+                )
+                val resp = repo.create(req)
+                if (resp.isSuccessful) {
+                    _uiState.value = _uiState.value.copy(
+                        successMsg = "Ticket enviado correctamente"
+                    )
+                    // recargar lista
+                    loadTickets()
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        isLoading = false,
+                        errorMsg = "Error ${resp.code()}: ${resp.message()}"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMsg = "Error al crear ticket: ${e.message}"
+                )
+            } finally {
+                _uiState.value = _uiState.value.copy(isLoading = false)
+            }
+        }
+    }
+
+    // 🔹 Eliminar ticket (DELETE)
+    fun deleteTicket(id: Long) {
+        viewModelScope.launch {
+            try {
+                val resp = repo.delete(id)
+                if (resp.isSuccessful) {
+                    _uiState.value = _uiState.value.copy(
+                        successMsg = "Ticket eliminado correctamente"
+                    )
+                    loadTickets()
+                } else {
+                    _uiState.value = _uiState.value.copy(
+                        errorMsg = "No se pudo eliminar (código ${resp.code()})"
+                    )
+                }
+            } catch (e: Exception) {
+                _uiState.value = _uiState.value.copy(
+                    errorMsg = "Error al eliminar ticket: ${e.message}"
+                )
+            }
+        }
+    }
+
+    // 🔹 Limpiar mensajes (lo usa tu pantalla)
+    fun clearMessages() {
+        _uiState.value = _uiState.value.copy(
+            errorMsg = null,
+            successMsg = null
+        )
+    }
+
+    // Opcionales: por si después quieres pantalla de detalle / edición
+    // usan getById y update del repo (ya quedan “funcionales”)
+    fun loadTicketById(id: Long, onLoaded: () -> Unit = {}) {
+        viewModelScope.launch {
+            try {
+                val resp = repo.getById(id)
+                if (resp.isSuccessful) {
+                    // aquí podrías guardar el ticket en otro estado si lo necesitas
+                    onLoaded()
+                }
+            } catch (_: Exception) { }
+        }
+    }
+
+    fun updateTicket(
+        id: Long,
+        userId: Long,
+        empresaId: Long?,
+        asunto: String,
+        descripcion: String
+    ) {
         viewModelScope.launch {
             try {
                 val req = TicketRequest(
                     userId = userId,
                     empresaId = empresaId,
                     asunto = asunto,
-                    descripcion = descripcion,
-                    estado = null // backend pone ABIERTO por defecto
+                    descripcion = descripcion
                 )
-                val response = repo.create(req)
-                if (response.isSuccessful) {
-                    // recargar la lista
+                val resp = repo.update(id, req)
+                if (resp.isSuccessful) {
+                    _uiState.value = _uiState.value.copy(
+                        successMsg = "Ticket actualizado"
+                    )
                     loadTickets()
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        successMsg = "Ticket creado correctamente"
-                    )
-                } else {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMsg = "No se pudo crear el ticket (${response.code()})"
-                    )
                 }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    errorMsg = "Error de conexión al crear el ticket"
-                )
-            }
+            } catch (_: Exception) { }
         }
-    }
-
-    fun deleteTicket(id: Long) {
-        _uiState.value = _uiState.value.copy(isLoading = true, errorMsg = null, successMsg = null)
-        viewModelScope.launch {
-            try {
-                val response = repo.delete(id)
-                if (response.isSuccessful || response.code() == 204) {
-                    loadTickets()
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        successMsg = "Ticket eliminado"
-                    )
-                } else {
-                    _uiState.value = _uiState.value.copy(
-                        isLoading = false,
-                        errorMsg = "No se pudo eliminar el ticket (${response.code()})"
-                    )
-                }
-            } catch (e: Exception) {
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    errorMsg = "Error de conexión al eliminar ticket"
-                )
-            }
-        }
-    }
-
-    fun clearMessages() {
-        _uiState.value = _uiState.value.copy(errorMsg = null, successMsg = null)
     }
 }
