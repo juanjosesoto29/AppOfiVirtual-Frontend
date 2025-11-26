@@ -5,7 +5,7 @@ import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
 import com.example.ofivirtualapp.data.remote.ticket.TicketResponse
-import com.example.ofivirtualapp.ui.theme.OfiVirtualV3Theme // ⬅️ AJUSTA si tu tema se llama distinto
+import com.example.ofivirtualapp.ui.theme.OfiVirtualV3Theme
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
