@@ -9,6 +9,6 @@
         <domain includeSubdomains="true">localhost</domain>
         <domain includeSubdomains="true">192.168.100.21</domain>  <!-- oficina -->
         <domain includeSubdomains="true">192.168.1.16</domain> <!-- casa fran -->
-        <domain includeSubdomains="true">10.155.86.135</domain>
+        <domain includeSubdomains="true">10.155.84.223</domain>
     </domain-config>
 </network-security-config>

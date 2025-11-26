@@ -11,9 +11,9 @@ import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
 
-    private const val BASE_URL_USERS = "http://10.155.86.135:8082/"
-    private const val BASE_URL_PLANES = "http://10.155.86.135:8085/"
-    private const val BASE_URL_SOPORTE = "http://10.155.86.135:8086/" // duoc
+    private const val BASE_URL_USERS = "http://10.155.84.223:8082/"
+    private const val BASE_URL_PLANES = "http://10.155.84.223:8085/"
+    private const val BASE_URL_SOPORTE = "http://10.155.84.223:8086/" // duoc
 
     //private const val BASE_URL_SOPORTE = "http://192.168.100.21:8086/" // Oficina
     //private const val BASE_URL_SOPORTE = "http://192.168.1.16:8086/"// casa
