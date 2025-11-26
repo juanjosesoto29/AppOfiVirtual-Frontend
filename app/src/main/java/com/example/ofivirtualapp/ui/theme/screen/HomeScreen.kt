@@ -25,6 +25,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.ofivirtualapp.R
 import com.example.ofivirtualapp.navigation.Route
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.ofivirtualapp.viewmodel.IndicadoresViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -147,6 +149,9 @@ fun HomeScreen(
                     ),
                     color = ofiBlue
                 )
+                Spacer(Modifier.height(spacing))
+
+                IndicadoresEconomicosCard()
 
                 Spacer(Modifier.height(spacing))
 
@@ -363,5 +368,49 @@ private fun ContractItem(
             }
             StatusChip(label = chipLabel, bg = chipBg, fg = Color.White)
         }
+    }
+}
+@Composable
+fun IndicadoresEconomicosCard() {
+    val vm: IndicadoresViewModel = viewModel()
+    val state by vm.uiState.collectAsState()
+
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(containerColor = Color(0xFFF0F4FF)), // Un azul muy suave
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Column(Modifier.padding(16.dp)) {
+            Text(
+                "Indicadores Económicos (Hoy)",
+                style = MaterialTheme.typography.titleSmall,
+                fontWeight = FontWeight.Bold,
+                color = Color(0xFF071290)
+            )
+            Spacer(Modifier.height(8.dp))
+
+            if (state.isLoading) {
+                CircularProgressIndicator(modifier = Modifier.size(24.dp).align(Alignment.CenterHorizontally))
+            } else if (state.error != null) {
+                Text("No disponibles", style = MaterialTheme.typography.bodySmall, color = Color.Red)
+            } else {
+                state.data?.let {
+                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        ValoIndicador("UF", it.uf.valor)
+                        ValoIndicador("Dólar", it.dolar.valor)
+                        ValoIndicador("Euro", it.euro.valor)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ValoIndicador(nombre: String, valor: Double) {
+    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Text(nombre, style = MaterialTheme.typography.labelMedium, color = Color.Gray)
+        Text("$${valor.toInt()}", style = MaterialTheme.typography.bodyMedium, fontWeight = FontWeight.Bold)
     }
 }

@@ -8,6 +8,7 @@ import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
+import com.example.ofivirtualapp.data.remote.indicadores.IndicadoresApi
 
 object RetrofitClient {
 
@@ -18,6 +19,11 @@ object RetrofitClient {
     //private const val BASE_URL_SOPORTE = "http://192.168.100.21:8086/" // Oficina
     //private const val BASE_URL_SOPORTE = "http://192.168.1.16:8086/"// casa
 
+    private const val BASE_URL_EXTERNAL = "https://mindicador.cl/"
+
+    val indicadoresApi: IndicadoresApi by lazy {
+        buildRetrofit(BASE_URL_EXTERNAL).create(IndicadoresApi::class.java)
+    }
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
     }
