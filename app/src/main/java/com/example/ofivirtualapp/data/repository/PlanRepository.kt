@@ -1,7 +1,7 @@
 package com.example.ofivirtualapp.data.repository
 
-import com.example.ofivirtualapp.data.remote.PlanApi
-import com.example.ofivirtualapp.data.remote.PlanDto
+import com.example.ofivirtualapp.data.remote.plan.PlanApi
+import com.example.ofivirtualapp.data.remote.plan.PlanDto
 
 class PlanRepository(
     private val api: PlanApi

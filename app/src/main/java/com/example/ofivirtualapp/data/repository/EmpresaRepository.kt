@@ -1,8 +1,8 @@
 package com.example.ofivirtualapp.data.repository
 
-import com.example.ofivirtualapp.data.remote.EmpresaApi
-import com.example.ofivirtualapp.data.remote.EmpresaRequest
-import com.example.ofivirtualapp.data.remote.EmpresaResponse
+import com.example.ofivirtualapp.data.remote.empresa.EmpresaApi
+import com.example.ofivirtualapp.data.remote.empresa.EmpresaRequest
+import com.example.ofivirtualapp.data.remote.empresa.EmpresaResponse
 
 class EmpresaRepository(
     private val api: EmpresaApi

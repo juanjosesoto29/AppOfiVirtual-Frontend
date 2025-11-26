@@ -1,4 +1,4 @@
-package com.example.ofivirtualapp.data.remote
+package com.example.ofivirtualapp.data.remote.auth
 
 // Lo que ENVÍA tu app al backend
 

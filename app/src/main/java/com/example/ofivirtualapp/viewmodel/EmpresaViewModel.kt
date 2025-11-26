@@ -3,8 +3,8 @@ package com.example.ofivirtualapp.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.ofivirtualapp.data.local.storage.UserPreferences
-import com.example.ofivirtualapp.data.remote.EmpresaRequest
-import com.example.ofivirtualapp.data.remote.EmpresaResponse
+import com.example.ofivirtualapp.data.remote.empresa.EmpresaRequest
+import com.example.ofivirtualapp.data.remote.empresa.EmpresaResponse
 import com.example.ofivirtualapp.data.remote.RetrofitClient
 import com.example.ofivirtualapp.data.repository.EmpresaRepository
 import kotlinx.coroutines.flow.MutableStateFlow

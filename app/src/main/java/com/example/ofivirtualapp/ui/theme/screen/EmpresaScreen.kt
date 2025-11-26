@@ -11,8 +11,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.ofivirtualapp.data.remote.EmpresaRequest
-import com.example.ofivirtualapp.data.remote.EmpresaResponse
+import com.example.ofivirtualapp.data.remote.empresa.EmpresaRequest
+import com.example.ofivirtualapp.data.remote.empresa.EmpresaResponse
 import com.example.ofivirtualapp.viewmodel.EmpresaViewModel
 import com.example.ofivirtualapp.data.local.ChileGeoData
 

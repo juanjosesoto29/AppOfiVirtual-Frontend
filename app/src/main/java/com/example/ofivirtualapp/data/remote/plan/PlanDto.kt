@@ -1,4 +1,4 @@
-package com.example.ofivirtualapp.data.remote
+package com.example.ofivirtualapp.data.remote.plan
 
 data class PlanDto(
     val id: Long,

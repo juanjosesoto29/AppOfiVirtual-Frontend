@@ -1,7 +1,10 @@
-package com.example.ofivirtualapp.data.remote
+package com.example.ofivirtualapp.data.remote.empresa
 
 import retrofit2.Response
-import retrofit2.http.*
+import retrofit2.http.Body
+import retrofit2.http.GET
+import retrofit2.http.POST
+import retrofit2.http.Path
 
 interface EmpresaApi {
 

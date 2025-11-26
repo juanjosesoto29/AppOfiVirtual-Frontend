@@ -1,5 +1,8 @@
 package com.example.ofivirtualapp.data.remote
 
+import com.example.ofivirtualapp.data.remote.auth.UserApi
+import com.example.ofivirtualapp.data.remote.empresa.EmpresaApi
+import com.example.ofivirtualapp.data.remote.plan.PlanApi
 import com.example.ofivirtualapp.data.remote.ticket.TicketApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor

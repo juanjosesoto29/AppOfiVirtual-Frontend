@@ -1,6 +1,9 @@
 package com.example.ofivirtualapp.data.repository
 
-import com.example.ofivirtualapp.data.remote.*
+import com.example.ofivirtualapp.data.remote.auth.LoginRequest
+import com.example.ofivirtualapp.data.remote.auth.RegisterRequest
+import com.example.ofivirtualapp.data.remote.auth.UserApi
+import com.example.ofivirtualapp.data.remote.auth.UserResponse
 
 class AuthRepository(
     private val api: UserApi

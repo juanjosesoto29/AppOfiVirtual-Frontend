@@ -2,7 +2,7 @@ package com.example.ofivirtualapp.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.ofivirtualapp.data.remote.PlanDto
+import com.example.ofivirtualapp.data.remote.plan.PlanDto
 import com.example.ofivirtualapp.data.remote.RetrofitClient
 import com.example.ofivirtualapp.data.repository.PlanRepository
 import com.example.ofivirtualapp.ui.theme.screen.PlanOption

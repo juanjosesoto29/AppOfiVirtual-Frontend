@@ -1,4 +1,4 @@
-package com.example.ofivirtualapp.data.remote
+package com.example.ofivirtualapp.data.remote.empresa
 
 data class EmpresaRequest(
     val userId: Long,
