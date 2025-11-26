@@ -36,6 +36,7 @@ import com.example.ofivirtualapp.viewmodel.CartViewModel
 import com.example.ofivirtualapp.viewmodel.PerfilViewModel
 import com.example.ofivirtualapp.viewmodel.EmpresaViewModel
 import com.example.ofivirtualapp.viewmodel.TicketViewModel
+import com.example.ofivirtualapp.viewmodel.*
 import kotlinx.coroutines.launch
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.runtime.LaunchedEffect
@@ -48,8 +49,12 @@ fun AppNavGraph(
 ) {
 
     val navController = rememberNavController()
+    val context = LocalContext.current
+    val userPrefs = remember { UserPreferences(context) }
     val cartViewModel: CartViewModel = viewModel()
-    val ticketViewModel: TicketViewModel = viewModel()
+    val ticketViewModel: TicketViewModel = viewModel(
+        factory = TicketViewModelFactory(userPrefs)
+    )
     val cartCount by cartViewModel.cartCount
 
     val goTo: (String) -> Unit = { route -> navController.navigate(route) }
@@ -62,9 +67,7 @@ fun AppNavGraph(
         }
     }
 
-    val context = LocalContext.current
     val uriHandler = LocalUriHandler.current
-    val userPrefs = remember { UserPreferences(context) }
     val scope = rememberCoroutineScope()
 
     Scaffold(

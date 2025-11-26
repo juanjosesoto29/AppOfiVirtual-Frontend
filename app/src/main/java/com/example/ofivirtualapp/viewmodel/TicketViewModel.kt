@@ -8,15 +8,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import com.example.ofivirtualapp.data.local.storage.UserPreferences
+import kotlinx.coroutines.flow.firstOrNull
 
 class TicketViewModel(
+    private val userPreferences: UserPreferences,
     private val repo: TicketRepository = TicketRepository()
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SoporteUiState())
     val uiState: StateFlow<SoporteUiState> = _uiState.asStateFlow()
 
-    // 🔹 Cargar todos los tickets (GET ALL)
+    // se Cargan todos los tickets (GET ALL)
     fun loadTickets() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(
@@ -47,9 +50,8 @@ class TicketViewModel(
         }
     }
 
-    // 🔹 Crear ticket (POST)
+    // se Crea ticket (POST)
     fun createTicket(
-        userId: Long,
         empresaId: Long?,
         asunto: String,
         descripcion: String
@@ -60,9 +62,18 @@ class TicketViewModel(
                 errorMsg = null,
                 successMsg = null
             )
+            val realUserId = userPreferences.userId.firstOrNull()
+
+            if (realUserId == null) {
+                _uiState.value = _uiState.value.copy(
+                    isLoading = false,
+                    errorMsg = "Error: Usuario no identificado. Inicia sesión nuevamente."
+                )
+                return@launch
+            }
             try {
                 val req = TicketRequest(
-                    userId = userId,
+                    userId = realUserId,
                     empresaId = empresaId,
                     asunto = asunto,
                     descripcion = descripcion
@@ -91,7 +102,7 @@ class TicketViewModel(
         }
     }
 
-    // 🔹 Eliminar ticket (DELETE)
+    // se Eliminan ticket (DELETE)
     fun deleteTicket(id: Long) {
         viewModelScope.launch {
             try {
@@ -114,7 +125,7 @@ class TicketViewModel(
         }
     }
 
-    // 🔹 Limpiar mensajes (lo usa tu pantalla)
+    // se Limpian mensajes (lo usa tu pantalla)
     fun clearMessages() {
         _uiState.value = _uiState.value.copy(
             errorMsg = null,
@@ -122,8 +133,6 @@ class TicketViewModel(
         )
     }
 
-    // Opcionales: por si después quieres pantalla de detalle / edición
-    // usan getById y update del repo (ya quedan “funcionales”)
     fun loadTicketById(id: Long, onLoaded: () -> Unit = {}) {
         viewModelScope.launch {
             try {

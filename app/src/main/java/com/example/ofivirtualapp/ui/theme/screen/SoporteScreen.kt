@@ -8,9 +8,9 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.HelpOutline
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -22,9 +22,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.ofivirtualapp.data.remote.ticket.TicketResponse
 import com.example.ofivirtualapp.viewmodel.TicketViewModel
 
-// ---------------------------
-//    WRAPPER
-// ---------------------------
+
 @Composable
 fun SoporteScreenVm(
     vm: TicketViewModel,
@@ -42,7 +40,6 @@ fun SoporteScreenVm(
         successMsg = state.successMsg,
         onCreateTicket = { asunto, descripcion ->
             vm.createTicket(
-                userId = 1L,   // reemplazar por user real luego
                 empresaId = null,
                 asunto = asunto,
                 descripcion = descripcion
@@ -64,9 +61,7 @@ fun SoporteScreenVm(
     )
 }
 
-// ---------------------------
-//    MAIN SCREEN
-// ---------------------------
+
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalAnimationApi::class)
 @Composable
 fun SoporteScreen(
@@ -98,7 +93,7 @@ fun SoporteScreen(
                 },
                 actions = {
                     IconButton(onClick = onGoToFaq) {
-                        Icon(Icons.Filled.HelpOutline, contentDescription = "Preguntas frecuentes")
+                        Icon(Icons.AutoMirrored.Filled.HelpOutline, contentDescription = "Preguntas frecuentes")
                     }
                 }
             )

@@ -1,6 +1,6 @@
 package com.example.ofivirtualapp.data.remote
 
-import com.example.ofivirtualapp.data.remote.ticket.TicketApi   // 👈 FALTA ESTO
+import com.example.ofivirtualapp.data.remote.ticket.TicketApi
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -10,9 +10,10 @@ object RetrofitClient {
 
     private const val BASE_URL_USERS = "http://10.155.86.135:8082/"
     private const val BASE_URL_PLANES = "http://10.155.86.135:8085/"
-    //private const val BASE_URL_SOPORTE = "http://192.168.100.21:8086/" // Oficina
-    //private const val BASE_URL_SOPORTE = "http://192.168.1.16:8086/"// casa fran
     private const val BASE_URL_SOPORTE = "http://10.155.86.135:8086/" // duoc
+
+    //private const val BASE_URL_SOPORTE = "http://192.168.100.21:8086/" // Oficina
+    //private const val BASE_URL_SOPORTE = "http://192.168.1.16:8086/"// casa
 
     private val logging = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY
